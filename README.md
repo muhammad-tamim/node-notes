@@ -83,7 +83,111 @@ Note:
 
 ### Examples:
 
-**Frontend:**
+**Example 1:**
+
+Backend:
+
+```js
+const express = require('express')
+const cors = require('cors')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
+const port = process.env.PORT || 3000
+
+const app = express()
+app.use(cors()) // use cors middleware
+app.use(express.json()) // use express middleware
+
+
+const uri = "mongodb+srv://db-user:HSVPnZLwfnPGPjAB@cluster0.ec7ovco.mongodb.net/?appName=Cluster0";
+
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
+});
+
+async function run() {
+
+    await client.connect();
+
+    const notesCollection = client.db("crudDB").collection('notes')
+
+
+    // POST - create new note
+    app.post('/notes', async (req, res) => {
+        const note = req.body;
+        const result = await notesCollection.insertOne(note);
+        res.send(result);
+    });
+
+
+    // GET all notes
+    app.get('/notes', async (req, res) => {
+        const notes = await notesCollection.find({}).toArray();
+        res.send(notes);
+    });
+
+    // GET a single note
+    app.get('/notes/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: new ObjectId(id) }
+        const result = await notesCollection.findOne(query);
+        res.send(result);
+    });
+
+
+    // PATCH - partial update
+    app.patch('/notes/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: new Object(id) }
+        const frontendUpdatedData = req.body;
+        const updatedDoc = {
+            $set: frontendUpdatedData
+        }
+
+        const result = await notesCollection.updateOne(query, updatedDoc);
+        res.send(result);
+    });
+
+    // PUT - full replace
+    app.put('/notes/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: new ObjectId(id) }
+        const frontendUpdatedData = req.body;
+        const options = { upsert: true }
+
+        const result = await notesCollection.replaceOne(query, frontendUpdatedData, options);
+        res.send(result);
+    });
+
+
+    // DELETE
+    app.delete('/notes/:id', async (req, res) => {
+        const result = await notesCollection.deleteOne({ _id: new ObjectId(req.params.id) });
+        res.send(result);
+    });
+
+
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+
+}
+run().catch(console.dir);
+
+
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+```
+
+Frontend:
 
 ```jsx
 import React, { useEffect, useState } from 'react';
@@ -317,7 +421,13 @@ const App = () => {
 export default App;
 ```
 
-**Backend:**
+
+
+![image](./images/crud-operation.png)
+
+**Example 2:**
+
+Backend:
 
 ```js
 const express = require('express')
@@ -342,70 +452,55 @@ const client = new MongoClient(uri, {
 });
 
 async function run() {
-
     await client.connect();
+    const usersCollection = client.db("userdb").collection('users')
 
-    const notesCollection = client.db("crudDB").collection('notes')
-
-
-    // POST - create new note
-    app.post('/notes', async (req, res) => {
-        const note = req.body;
-        const result = await notesCollection.insertOne(note);
+    app.post('/users', async (req, res) => {
+        const newUser = req.body;
+        const result = await usersCollection.insertOne(newUser);
         res.send(result);
     });
 
 
-    // GET all notes
-    app.get('/notes', async (req, res) => {
-        const notes = await notesCollection.find({}).toArray();
-        res.send(notes);
-    });
-
-    // GET a single note
-    app.get('/notes/:id', async (req, res) => {
+    app.get('/users', async (req, res) => {
+        const cursor = usersCollection.find()
+        const users = await cursor.toArray()
+        res.send(users)
+    })
+    app.get('/users/:id', async (req, res) => {
         const id = req.params.id
         const query = { _id: new ObjectId(id) }
-        const result = await notesCollection.findOne(query);
-        res.send(result);
-    });
+        const result = await usersCollection.findOne(query)
+        res.send(result)
+    })
 
-
-    // PATCH - partial update
-    app.patch('/notes/:id', async (req, res) => {
+    app.put('/users/:id', async (req, res) => {
         const id = req.params.id
-        const query = { _id: new Object(id) }
-        const frontendUpdatedData = req.body;
+        const filter = { _id: new ObjectId(id) }
+        const user = req.body
+
         const updatedDoc = {
-            $set: frontendUpdatedData
+            $set: {
+                name: user.name,
+                email: user.email
+            }
         }
-
-        const result = await notesCollection.updateOne(query, updatedDoc);
-        res.send(result);
-    });
-
-    // PUT - full replace
-    app.put('/notes/:id', async (req, res) => {
-        const id = req.params.id
-        const query = { _id: new ObjectId(id) }
-        const frontendUpdatedData = req.body;
         const options = { upsert: true }
 
-        const result = await notesCollection.replaceOne(query, frontendUpdatedData, options);
-        res.send(result);
-    });
+        const result = await usersCollection.updateOne(filter, updatedDoc, options)
+        res.send(result)
+    })
 
+    app.delete('/users/:id', async (req, res) => {
+        const id = req.params.id
+        const query = { _id: new ObjectId(id) }
+        const result = await usersCollection.deleteOne(query)
+        res.send(result)
+    })
 
-    // DELETE
-    app.delete('/notes/:id', async (req, res) => {
-        const result = await notesCollection.deleteOne({ _id: new ObjectId(req.params.id) });
-        res.send(result);
-    });
-
-
+    // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
-
 }
 run().catch(console.dir);
 
@@ -419,4 +514,223 @@ app.listen(port, () => {
 })
 ```
 
-![image](./images/crud-operation.png)
+Frontend: 
+
+```jsx
+// main.jsx
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client';
+import './index.css'
+import { createBrowserRouter, RouterProvider } from 'react-router';
+import MainLayout from './layout/MainLayout';
+import App from './App';
+import UserDetails from './components/UserDetails';
+import UpdateUser from './components/UpdateUser';
+
+
+const router = createBrowserRouter([
+  {
+    path: '/',
+    Component: MainLayout,
+    children: [
+      {
+        index: true,
+        Component: App
+      },
+      {
+        path: '/userDetails/:id',
+        Component: UserDetails,
+        loader: ({ params }) => fetch(`http://localhost:3000/users/${params.id}`),
+        hydrateFallbackElement: <p>Loading..........</p>
+      },
+      {
+        path: '/updateUser/:id',
+        Component: UpdateUser,
+        loader: ({ params }) => fetch(`http://localhost:3000/users/${params.id}`),
+        hydrateFallbackElement: <p>Loading..........</p>
+      },
+    ]
+  },
+])
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <RouterProvider router={router}></RouterProvider>
+  </StrictMode>,
+)
+```
+
+```jsx
+import React from 'react';
+import { Outlet } from 'react-router';
+
+const MainLayout = () => {
+    return (
+        <div>
+            <Outlet></Outlet>
+        </div>
+    );
+};
+
+export default MainLayout;
+```
+
+```jsx
+import React from 'react';
+import Users from './components/Users';
+
+const usersPromise = fetch('http://localhost:3000/users').then(res => res.json())
+
+const App = () => {
+    return (
+        <div>
+            <Users usersPromise={usersPromise}></Users>
+        </div>
+    );
+};
+
+export default App;
+```
+
+```jsx
+import React from 'react';
+import { useState } from 'react';
+import { use } from 'react';
+import { Link } from 'react-router';
+
+const Users = ({ usersPromise }) => {
+
+    const initialUsers = use(usersPromise)
+    const [users, setUsers] = useState(initialUsers)
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        const name = e.target.name.value
+        const email = e.target.email.value
+        const newUser = { name, email }
+
+        fetch('http://localhost:3000/users', {
+            method: "POST",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(newUser)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.insertedId) {
+                    newUser._id = data.insertedId
+                    const newUsers = [...users, newUser]
+                    setUsers(newUsers)
+
+                    alert("User Added Successfully")
+                    console.log(data)
+                    e.target.reset()
+                }
+            })
+    }
+
+
+    const handleDelete = (id) => {
+        fetch(`http://localhost:3000/users/${id}`, {
+            method: "DELETE",
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.deletedCount) {
+                    const remainingUsers = users.filter((user) => user._id !== id)
+                    setUsers(remainingUsers)
+
+                    alert("User deleted successfully")
+                    console.log(data)
+                }
+            })
+    }
+
+    return (
+        <div>
+            <form onSubmit={handleSubmit}>
+                <input type="text" name="name" className='input' /><br />
+                <input type="email" name="email" className='input' /><br />
+                <input type="submit" value="Summit" className='btn' />
+            </form>
+
+            {/* view users */}
+            <div>
+                {users.map((user) =>
+                    <p key={user._id}>
+                        {user.name} | {user.email}
+                        <button onClick={() => handleDelete(user._id)} className='btn btn-xs'>X</button>
+                        <Link to={`/userDetails/${user._id}`} className='btn btn-xs'>Details</Link>
+                        <Link to={`/updateUser/${user._id}`} className='btn btn-xs'>Update</Link>
+                    </p>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default Users;
+```
+
+```jsx
+import React from 'react';
+import { useLoaderData } from 'react-router';
+
+const UserDetails = () => {
+    const user = useLoaderData()
+    console.log(user)
+    return (
+        <div>
+            <p>{user.name}</p>
+            <p>{user.email}</p>
+        </div>
+    );
+};
+
+export default UserDetails;
+```
+
+```jsx
+import React from 'react';
+import { useLoaderData } from 'react-router';
+
+const UpdateUser = () => {
+    const user = useLoaderData()
+
+    const handleUpdate = e => {
+        e.preventDefault()
+        const name = e.target.name.value
+        const email = e.target.email.value
+        const updatedUser = { name, email }
+
+        fetch(`http://localhost:3000/users/${user._id}`, {
+            method: "PUT",
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify(updatedUser)
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.modifiedCount) {
+                    alert("User updated Successfully")
+                    console.log(data)
+                }
+            })
+
+    }
+
+    return (
+        <form onSubmit={handleUpdate}>
+            <input type="text" name="name" className='input' defaultValue={user.name} /><br />
+            <input type="email" name="email" className='input' defaultValue={user.email} /><br />
+            <input type="submit" value="Summit" className='btn' />
+        </form>
+    );
+};
+
+export default UpdateUser;
+```
+
+![image](./images/crud-operation2.png)
