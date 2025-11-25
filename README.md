@@ -1033,3 +1033,31 @@ app.delete('/users/:email', async (req, res) => {
 });
 ```
 
+### bulkWrite():
+bulkWrite() allows you to perform multiple write operations (insert/update/delete) operations at once:
+
+```js
+app.post('/users/bulk-update', async (req, res) => {
+    const operations = [
+        // Update role for all moderators
+        { updateMany: { 
+            filter: { role: "moderator" }, 
+            update: { $set: { role: "senior-moderator" } } 
+        }},
+
+        // Update role for a specific user
+        { updateOne: { 
+            filter: { email: "user1@gmail.com" }, 
+            update: { $set: { role: "admin" } } 
+        }},
+
+        // Delete inactive users
+        { deleteMany: { filter: { status: "inactive" } } }
+    ];
+
+    const result = await usersCollection.bulkWrite(operations);
+
+    res.send(result);
+});
+```
+
