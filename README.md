@@ -29,6 +29,8 @@
     - [bulkWrite():](#bulkwrite)
     - [Difference Between req.body, req.params and req.query:](#difference-between-reqbody-reqparams-and-reqquery)
     - [Examples:](#examples)
+      - [Example 1:](#example-1)
+      - [Example 2:](#example-2)
 
 
 # Node + Express + MongoDB:
@@ -1153,7 +1155,7 @@ app.get('/users', async (req, res) => {
 
 ### Examples:
 
-**Example 1:**
+#### Example 1:
 
 Backend:
 
@@ -1214,7 +1216,7 @@ async function run() {
         const id = req.params.id
         const filter = { _id: new ObjectId(id) }
         const updatedData = req.body;
-        const updatedDoc = {
+        const updateDoc = {
             $set: frontendUpdatedData
         }
 
@@ -1225,11 +1227,11 @@ async function run() {
     // PUT - full replace
     app.put('/notes/:id', async (req, res) => {
         const id = req.params.id
-        const query = { _id: new ObjectId(id) }
-        const frontendUpdatedData = req.body;
+        const filter = { _id: new ObjectId(id) }
+        const updatedData = req.body;
         const options = { upsert: true }
 
-        const result = await notesCollection.replaceOne(query, frontendUpdatedData, options);
+        const result = await notesCollection.replaceOne(filter, updatedData, options);
         res.send(result);
     });
 
@@ -1495,7 +1497,7 @@ export default App;
 
 ![image](./images/crud-operation.png)
 
-**Example 2:**
+#### Example 2:
 
 Backend:
 
@@ -1526,30 +1528,30 @@ async function run() {
     const usersCollection = client.db("userdb").collection('users')
 
     app.post('/users', async (req, res) => {
-        const newUser = req.body;
-        const result = await usersCollection.insertOne(newUser);
+        const user = req.body;
+        const result = await usersCollection.insertOne(user);
         res.send(result);
     });
 
-
     app.get('/users', async (req, res) => {
         const cursor = usersCollection.find()
-        const users = await cursor.toArray()
-        res.send(users)
-    })
-    app.get('/users/:id', async (req, res) => {
-        const id = req.params.id
-        const query = { _id: new ObjectId(id) }
-        const result = await usersCollection.findOne(query)
+        const result = await cursor.toArray()
         res.send(result)
     })
 
-    app.put('/users/:id', async (req, res) => {
+    app.get('/users/:id', async (req, res) => {
+        const id = req.params.id
+        const filter = { _id: new ObjectId(id) }
+        const result = await usersCollection.findOne(filter)
+        res.send(result)
+    })
+
+    app.Patch('/users/:id', async (req, res) => {
         const id = req.params.id
         const filter = { _id: new ObjectId(id) }
         const user = req.body
 
-        const updatedDoc = {
+        const updateDoc = {
             $set: {
                 name: user.name,
                 email: user.email
@@ -1557,7 +1559,7 @@ async function run() {
         }
         const options = { upsert: true }
 
-        const result = await usersCollection.updateOne(filter, updatedDoc, options)
+        const result = await usersCollection.updateOne(filter, updateDoc, options)
         res.send(result)
     })
 
