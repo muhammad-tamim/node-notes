@@ -1061,3 +1061,60 @@ app.post('/users/bulk-update', async (req, res) => {
 });
 ```
 
+### Difference Between req.body, req.params and req.query:
+
+- req.body → used when we need requested body info:
+
+Frontend:
+
+```js
+fetch('http://localhost:3000/users', {
+  method: 'POST',
+  headers: { 
+    'content-type': 'application/json' 
+  },
+  body: JSON.stringify({ name: "Tamim", email: "a@a.com" })
+})
+```
+
+Backend: 
+
+```js
+app.post('/users', async (req, res) => {
+    const newUser = req.body;
+    console.log(newUser) // { name: "Tamim", email: "a@a.com" }
+    const result = await usersCollection.insertOne(newUser);
+    res.send(result); 
+});
+```
+
+- req.params → used when we need requested url dynamic url path:
+
+```js
+app.get('/users/:id', async (req, res) => {
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const result = await usersCollection.findOne(query);
+    res.send(result);
+});
+```
+
+- req.query → used when we need requested url part after ?
+
+```js
+app.get('/users', async (req, res) => {
+    const page = parseInt(req.query.page); // http://localhost:3000/users?page=${page}
+    const limit = 5;
+    const skip = (page - 1) * limit;
+
+    const result = await usersCollection
+        .find()
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+
+    res.send(result);
+});
+```
+
+
