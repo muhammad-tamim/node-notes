@@ -838,3 +838,157 @@ Output:
 ]
 ```
 
+### Update( PATCH/PUT )
+
+#### PATCH (partial update - recommended):
+
+##### updateOne():
+
+```js
+app.patch('/users/:id', async (req, res) => {
+    const id = req.params.id;
+    const updatedData = req.body;
+
+    const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: updatedData }
+    );
+
+    res.send(result);
+});
+```
+
+##### updateMany():
+
+```js
+app.patch('/users/update-city', async (req, res) => {
+    const { oldCity, newCity } = req.body;
+
+    const result = await usersCollection.updateMany(
+        { city: oldCity },      // find condition
+        { $set: { city: newCity } } // update operation
+    );
+
+    res.send(result);
+});
+```
+
+##### Patch Operators:
+
+- $inc: Use when you want to increase or decrease a number on the document field:
+
+```js
+app.patch('/users/add-balance/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $inc: { balance: 100 } } // for decrease use -100
+    );
+
+    res.send(result);
+});
+```
+
+- $push: Use to add an item from an array in a document field:
+
+```js
+app.patch('/users/hobby/:id', async (req, res) => {
+    const id = req.params.id;
+    const hobby = req.body.hobby;
+
+    const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $push: { hobbies: hobby } }
+    );
+
+    res.send(result);
+});
+```
+- $pull: Use to remove an item from an array in a document field:
+
+```js
+app.patch('/users/hobby-remove/:id', async (req, res) => {
+    const id = req.params.id;
+    const hobby = req.body.hobby;
+
+    const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },
+        { $pull: { hobbies: cricket } } 
+    );
+
+    res.send(result);
+});
+```
+- $unset: Use to Remove a Field in the document:
+
+```js
+app.patch('/users/remove-age/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const result = await usersCollection.updateOne(
+        { _id: new ObjectId(id) },   // find user
+        { $unset: { age: "" } }      // remove the field 
+    );
+
+    res.send(result);
+});
+```
+Note: The value of the field inside $unset doesn’t matter ("", null, 1) — anything works
+
+- $upsert: Used to update a document if it exists, or create a new document if it does not exist. The new document will include:
+- The fields from the filter (query)
+- The fields from the update operation (e.g., $set)
+
+```js
+app.patch('/users/:email', async (req, res) => {
+    const email = req.params.email;
+    const updatedFields = req.body;
+
+    const result = await usersCollection.updateOne(
+        { email: email },        // find user by email
+        { $set: updatedFields }, // update only provided fields
+        { upsert: true }         // create if not exist
+    );
+
+    res.send(result);
+});
+```
+
+#### PUT (Full Replace):
+
+##### replaceOne(): 
+
+Removed missing fields
+
+```js
+app.put('/users/:id', async (req, res) => {
+    const id = req.params.id;
+    const newData = req.body;
+
+    const result = await usersCollection.replaceOne(
+        { _id: new ObjectId(id) },
+        newData
+    );
+
+    res.send(result);
+});
+```
+##### findOneAndReplace():
+Replace a document and return it
+
+```js
+app.put('/users/replace/:id', async (req, res) => {
+    const id = req.params.id;
+    const newUserData = req.body;
+
+    const result = await usersCollection.findOneAndReplace(
+        { _id: new ObjectId(id) },   // find document
+        newUserData,                 // completely replace with this
+        { returnDocument: 'after' }  // return the replaced document
+    );
+
+    res.send(result);
+});
+```
+
