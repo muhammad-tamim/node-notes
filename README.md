@@ -992,3 +992,44 @@ app.put('/users/replace/:id', async (req, res) => {
 });
 ```
 
+### Delete(DELETE)
+
+#### deleteOne():
+delete a specific document.
+
+```js
+app.delete('/users/:id', async (req, res) => {
+    const id = req.params.id;
+
+    const result = await usersCollection.deleteOne({ _id: new ObjectId(id) });
+
+    res.send(result);
+});
+```
+
+#### deleteMany():
+delete multiple items.
+
+```js
+app.delete('/users', async (req, res) => {
+    const { role } = req.query;
+    const result = await usersCollection.deleteMany({ role });
+    res.send(result);
+});
+```
+
+#### findOneAndDelete():
+Delete a single document that matches a filter and return the deleted document.
+
+```js
+app.delete('/users/:email', async (req, res) => {
+    const email = req.params.email; // filter
+
+    const result = await usersCollection.findOneAndDelete(
+        { email: email }  
+    );
+
+    res.send(result);
+});
+```
+
