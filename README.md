@@ -1,7 +1,9 @@
 <h1 align="center">Node Notes</h1>
 
 - [Node + Express + MongoDB:](#node--express--mongodb)
-  - [setup:](#setup)
+  - [Introduction:](#introduction)
+    - [setup:](#setup)
+    - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
   - [CRUD Operation:](#crud-operation)
     - [Create(POST)](#createpost)
       - [insertOne():](#insertone)
@@ -38,7 +40,8 @@
 
 
 # Node + Express + MongoDB:
-## setup:
+## Introduction:
+### setup:
 
 **step 1:** 
 
@@ -137,6 +140,53 @@ Note: Middleware in Express is a function that runs between the request and the 
 }
 ```
 
+### How a api code works in node+express+mongodb:
+
+```js
+app.post('/users', async (req, res) => {
+    const user = req.body;
+    const result = await usersCollection.insertOne(user);
+    res.send(result); 
+});
+```
+
+here,
+- `app.post('/users'.......)`: 
+  - `app` is a variable that contains express object (const app = express()).
+  - `.post()` is a methods of the app object
+  - `'/users'` is a endPoint(URL path). When the client sends a POST request to /users, this code runs.
+
+- `async/await`: 
+  - `async` marks the function as asynchronous so you can use await inside it.
+  - `await` works same like .then(), it's pause the async function until the promise if resolved.
+  
+- `(req, res) => {...}`: this is a anonymous arrow function that contains two parameters: 
+  - req = request object containing data from the client (req.body, req.params, req.query)
+  - res = response object used to send data back to the client (res.json(), res.send(), res.status())
+
+so we can do the same things using .then():
+
+```js
+app.post('/users', (req, res) => {
+    const user = req.body;
+    usersCollection.insertOne(user)
+    .then(result => res.send(result))
+});
+
+```
+
+**Note:**
+
+In the frontend we need two .then(), because fetch() returns a response object, and you must convert it using .json() before using in the your code.
+
+```js
+fetch('api')
+.then(res => res.json())
+.then(data => console.log(data))
+```
+
+But in mongodb methods are already return js object when their promises resolve. So inside express we don't need to use res.json(), we can directly send the object using res.send().
+
 
 ## CRUD Operation:
 
@@ -163,24 +213,6 @@ Database                 Database
 
 ```
 
-**How a api code works in node+express+mongodb:**
-
-```js
-app.post('/users', async (req, res) => {
-    const user = req.body;
-    const result = await usersCollection.insertOne(user);
-    res.send(result); 
-});
-```
-
-here,
-- `app.post()`: used to create a post request api.
-- `'/users'`: This is the endpoint of that post request api
-- async/await: we used async/awit because here we do asynchornus operation and they 
-- (req, res) => {}: his is an anonymous callback function with two parameter, req and res 
-    - req: contains data coming from the client
-    - res: used to send response back to the client
-
 
 ### Create(POST)
 #### insertOne():
@@ -193,11 +225,6 @@ app.post('/users', async (req, res) => {
     res.send(result); 
 });
 ```
-here, 
-- (req, res) => {}: his is an anonymous callback function with two parameter, req and res 
-    - req: contains all data coming from the client
-    - res: used to send response back to the client
-
 
 Note: Sometimes we generate some values ourselves:
 
