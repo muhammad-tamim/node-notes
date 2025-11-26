@@ -31,6 +31,10 @@
     - [Examples:](#examples)
       - [Example 1:](#example-1)
       - [Example 2:](#example-2)
+    - [Others:](#others)
+      - [Different way to  Accessing form data:](#different-way-to--accessing-form-data)
+        - [Manual accessing:](#manual-accessing)
+        - [Using formData():](#using-formdata)
 
 
 # Node + Express + MongoDB:
@@ -159,6 +163,25 @@ Database                 Database
 
 ```
 
+**How a api code works in node+express+mongodb:**
+
+```js
+app.post('/users', async (req, res) => {
+    const user = req.body;
+    const result = await usersCollection.insertOne(user);
+    res.send(result); 
+});
+```
+
+here,
+- `app.post()`: used to create a post request api.
+- `'/users'`: This is the endpoint of that post request api
+- async/await: we used async/awit because here we do asynchornus operation and they 
+- (req, res) => {}: his is an anonymous callback function with two parameter, req and res 
+    - req: contains data coming from the client
+    - res: used to send response back to the client
+
+
 ### Create(POST)
 #### insertOne():
 Insert a single document
@@ -170,6 +193,12 @@ app.post('/users', async (req, res) => {
     res.send(result); 
 });
 ```
+here, 
+- (req, res) => {}: his is an anonymous callback function with two parameter, req and res 
+    - req: contains all data coming from the client
+    - res: used to send response back to the client
+
+
 Note: Sometimes we generate some values ourselves:
 
 ```js
@@ -1807,7 +1836,10 @@ export default UpdateUser;
 
 ![image](./images/crud-operation2.png)
 
-Note: Instead of manually accessing each form field like this:
+### Others:
+#### Different way to  Accessing form data:
+
+##### Manual accessing:
 
 ```js
 const name = e.target.name.value
@@ -1816,7 +1848,17 @@ const phone = e.target.phone.value
 const address = e.target.address.value
 const data = {name, email, phone, address}
 ```
+
+##### Using formData():
 we can simplify the process using the FormData constructor. FormData automatically collects all input values from the form, and we can easily convert them into a plain JavaScript object using Object.fromEntries():
+
+```js
+const form = e.target
+const formData = new FormData(form)
+const email = formData.get('email')
+const password = formData.get('password')
+console.log(email, password)
+```
 
 ```js
 const form = e.target;
@@ -1824,3 +1866,5 @@ const formData = new FormData(form)
 const coffeeData = Object.fromEntries(formData.entries())
 console.log(coffeeData)
 ```
+
+
