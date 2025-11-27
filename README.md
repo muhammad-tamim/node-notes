@@ -1,9 +1,17 @@
 <h1 align="center">Node.js Notes</h1>
 
-- [Node:](#node)
+- [Part 1: Node:](#part-1-node)
   - [Introduction:](#introduction)
+    - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
+    - [What can node.js do:](#what-can-nodejs-do)
+    - [Node.js hello on server:](#nodejs-hello-on-server)
+    - [Node.js vs Browser:](#nodejs-vs-browser)
+    - [Node Version Manager(NVM):](#node-version-managernvm)
+    - [Common Architecture:](#common-architecture)
     - [How Web Works:](#how-web-works)
-- [Node + Express + MongoDB:](#node--express--mongodb)
+- [Part 2: Express:](#part-2-express)
+- [Part 3: MongoDb:](#part-3-mongodb)
+- [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
   - [Introduction:](#introduction-1)
     - [setup:](#setup)
     - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
@@ -42,8 +50,131 @@
         - [Using formData():](#using-formdata)
 
 
-# Node:
+# Part 1: Node: 
 ## Introduction: 
+Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
+
+- Runtime is an node.js environment that allows Node.js to run JavaScript outside the browser. 
+
+It's non-blocking I/O, event-driven, single-treaded and event loop architecture makes it highly efficient. so node is good for I/O heavy, event-driven: 
+- Real-time applications (chats, collaboration tools)
+- streaming applications 
+- Microservices.
+
+Note: Node.js may not be the best choice for CPU-intensive tasks, as they can block the event loop. For such tasks, consider building microservices in a more suitable language, such as Go or Java.
+
+### How Node.js Processes a Request: 
+
+```
+Client Request
+      |
+      v
+   Call Stack
+      |
+      |-- If SYNC task → executed immediately by main thread
+      |
+      |-- If ASYNC task:
+      |        |
+      |        |-- Network I/O / HTTP Requests / Promises etc
+      |        |       → handled by main tread
+      |        |
+      |        |-- File system / Crypto / Compression / Some DB tasks
+      |                → sent to Thread Pool 
+      |        |
+      |        v
+      |        When async task are done → callback added to Callback Queue
+      |
+      v
+Callback Queue
+      |
+      v
+Event Loop
+      |
+      |-- Constantly checks:
+      |       "Is Call Stack empty?"
+      |
+      |-- If YES → moves one callback from Callback Queue → Call Stack
+      |
+      v
+Call Stack executes callback → sends response
+      |
+      v
+Client receives response
+```
+
+Note: Thread Pool: A set of background worker threads that handle heavy CPU-intensive asynchronous tasks that would otherwise block the single main thread.
+
+### What can node.js do:
+- Build web servers and interact with databases
+- Create APIs
+  - RESTful APIs: Use HTTP methods (POST, GET, PUT, PATCH, DELETE) to interact with resources
+  - GraphQL APIs: Client specifies exactly what data it needs in a single query
+- Handle real-time data using WebSockets
+- Read, write, and manage files on the server
+- Build CLI (Command Line Interface) tools
+
+
+### Node.js hello on server:
+
+```js
+let http = require('http');
+http.createServer(function (req, res) {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end('Hello World!');
+}).listen(8080);
+```
+here,
+- let http = require('http'): 
+  - Imports the build-in http module in Node.js, its allows us to handle http request
+- http.createServer(): Creates a new HTTP server.
+- res.writeHead(200, { 'Content-Type': 'text/html' }):Sends HTTP headers to the client and tells the browser that the response is html with ok(200) status.
+- res.end('Hello World!'): Sends the response body to the client and closes the connection. 
+
+### Node.js vs Browser:
+Node.js and browsers both run JavaScript, but they have different environments and capabilities because Node.js is designed for server-side development, while browsers are for client-side applications.
+
+| Node.js                                             | Browser                                                     |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| provides APIs for file system, networking, and OS   | do not                                                      |
+| Global Object: global                               | Global Object:  window                                      |
+| support CommonJS (require) and ES6 modules (import) | support only ES6 module (import)                            |
+| uses npm/yarn for package management                | use CDN/bundlers(like webpack, vite) for package management |
+
+
+### Node Version Manager(NVM):
+NVM used to install and use different Node.js versions: 
+
+```js
+nvm install version // For install specific version
+nvm use version // For Switch different version
+npm ls // For see all install versions
+```
+
+### Common Architecture:
+- Monolithic Architecture:
+One big application that contains everything (frontend, backend, database), if one part fails, the entire app may fail.
+Example: A simple e-commerce website where frontend + backend + database logic live in one project.
+
+Application split into many small, independent services. Easy to scale and maintain.
+Example: Netflix, Amazon, banking systems.
+
+- Client-Server Architecture:
+A client asks → server responds.
+Example: Your React frontend (client) talking to Node.js API (server).
+
+- 3-Tier Architecture(Most Common Web App Structure):
+Three Layers: Presentation Layers (UI) + Application Layers (backend) + Database layer
+Example: React → Node.js → MongoDB
+
+- MVC Architecture:
+Three Parts: Model (data and database logic) + View (UI) + Controller (Handles requests means calling model and returning response to view)
+
+- Event-Driven Architecture:
+Actions trigger events → other services react. Great for real-time application.
+
+- Serverless Architecture:
+You write code → cloud runs it on demand without managing servers.
+
 ### How Web Works:
 
 ![image](./images/how-web-works.webp)
@@ -52,7 +183,11 @@
 
 
 
-# Node + Express + MongoDB:
+# Part 2: Express:
+
+# Part 3: MongoDb:
+
+# Part 4: Node + Express + MongoDB:
 ## Introduction:
 ### setup:
 
