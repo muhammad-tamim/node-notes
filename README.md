@@ -1,7 +1,10 @@
-<h1 align="center">Node Notes</h1>
+<h1 align="center">Node.js Notes</h1>
 
-- [Node + Express + MongoDB:](#node--express--mongodb)
+- [Node:](#node)
   - [Introduction:](#introduction)
+    - [How Web Works:](#how-web-works)
+- [Node + Express + MongoDB:](#node--express--mongodb)
+  - [Introduction:](#introduction-1)
     - [setup:](#setup)
     - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
   - [CRUD Operation:](#crud-operation)
@@ -37,6 +40,16 @@
       - [Different way to  Accessing form data:](#different-way-to--accessing-form-data)
         - [Manual accessing:](#manual-accessing)
         - [Using formData():](#using-formdata)
+
+
+# Node:
+## Introduction: 
+### How Web Works:
+
+![image](./images/how-web-works.webp)
+
+![image](./images/the-structure-of-a-url.png)
+
 
 
 # Node + Express + MongoDB:
