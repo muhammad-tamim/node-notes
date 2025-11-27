@@ -6,6 +6,7 @@
     - [What can node.js do:](#what-can-nodejs-do)
     - [Node.js vs Browser:](#nodejs-vs-browser)
     - [hello world on Node.js  server:](#hello-world-on-nodejs--server)
+    - [Node Version Manager(NVM):](#node-version-managernvm)
 - [Part 2: Express:](#part-2-express)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
@@ -135,6 +136,16 @@ here,
 - http.createServer(): Creates a new HTTP server.
 - res.writeHead(200, { 'Content-Type': 'text/html' }):Sends HTTP headers to the client and tells the browser that the response is html with ok(200) status.
 - res.end('Hello World!'): Sends the response body to the client and closes the connection.
+
+
+### Node Version Manager(NVM):
+NVM used to install and use different Node.js versions: 
+
+```js
+nvm install version // For install specific version
+nvm use version // For Switch different version
+npm ls // For see all install versions
+```
 
 
 
