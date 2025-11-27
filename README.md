@@ -5,10 +5,7 @@
     - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
     - [What can node.js do:](#what-can-nodejs-do)
     - [Node.js vs Browser:](#nodejs-vs-browser)
-    - [Node.js hello on server:](#nodejs-hello-on-server)
-    - [Node Version Manager(NVM):](#node-version-managernvm)
-    - [Common Architecture:](#common-architecture)
-    - [How Web Works:](#how-web-works)
+    - [hello world on Node.js  server:](#hello-world-on-nodejs--server)
 - [Part 2: Express:](#part-2-express)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
@@ -123,8 +120,7 @@ Node.js and browsers both run JavaScript, but they have different environments a
 | support CommonJS (require) and ES6 modules (import) | support only ES6 module (import)                            |
 | uses npm/yarn for package management                | use CDN/bundlers(like webpack, vite) for package management |
 
-
-### Node.js hello on server:
+### hello world on Node.js  server:
 
 ```js
 let http = require('http');
@@ -139,47 +135,6 @@ here,
 - http.createServer(): Creates a new HTTP server.
 - res.writeHead(200, { 'Content-Type': 'text/html' }):Sends HTTP headers to the client and tells the browser that the response is html with ok(200) status.
 - res.end('Hello World!'): Sends the response body to the client and closes the connection.
-
-
-### Node Version Manager(NVM):
-NVM used to install and use different Node.js versions: 
-
-```js
-nvm install version // For install specific version
-nvm use version // For Switch different version
-npm ls // For see all install versions
-```
-
-### Common Architecture:
-- Monolithic Architecture:
-One big application that contains everything (frontend, backend, database), if one part fails, the entire app may fail.
-Example: A simple e-commerce website where frontend + backend + database logic live in one project.
-
-Application split into many small, independent services. Easy to scale and maintain.
-Example: Netflix, Amazon, banking systems.
-
-- Client-Server Architecture:
-A client asks → server responds.
-Example: Your React frontend (client) talking to Node.js API (server).
-
-- 3-Tier Architecture(Most Common Web App Structure):
-Three Layers: Presentation Layers (UI) + Application Layers (backend) + Database layer
-Example: React → Node.js → MongoDB
-
-- MVC Architecture:
-Three Parts: Model (data and database logic) + View (UI) + Controller (Handles requests means calling model and returning response to view)
-
-- Event-Driven Architecture:
-Actions trigger events → other services react. Great for real-time application.
-
-- Serverless Architecture:
-You write code → cloud runs it on demand without managing servers.
-
-### How Web Works:
-
-![image](./images/how-web-works.webp)
-
-![image](./images/the-structure-of-a-url.png)
 
 
 
