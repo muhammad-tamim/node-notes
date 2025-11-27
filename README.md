@@ -1,6 +1,6 @@
 <h1 align="center">Node.js Notes</h1>
 
-- [Part 1: Node:](#part-1-node)
+- [Part 1: Node.js:](#part-1-nodejs)
   - [Introduction:](#introduction)
     - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
     - [What can node.js do:](#what-can-nodejs-do)
@@ -9,9 +9,9 @@
     - [Node Version Manager(NVM):](#node-version-managernvm)
     - [Common Architecture:](#common-architecture)
     - [How Web Works:](#how-web-works)
-- [Part 2: Express:](#part-2-express)
+- [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
-- [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
+- [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
   - [Introduction:](#introduction-1)
     - [setup:](#setup)
     - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
@@ -50,7 +50,7 @@
         - [Using formData():](#using-formdata)
 
 
-# Part 1: Node: 
+# Part 1: Node.js: 
 ## Introduction: 
 Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
 
@@ -184,11 +184,11 @@ You write code → cloud runs it on demand without managing servers.
 
 
 
-# Part 2: Express:
+# Part 2: Express.js:
 
 # Part 3: MongoDb:
 
-# Part 4: Node + Express + MongoDB:
+# Part 4: Node.js + Express.js + MongoDB:
 ## Introduction:
 ### setup:
 
