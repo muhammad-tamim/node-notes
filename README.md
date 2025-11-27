@@ -7,6 +7,7 @@
     - [Node.js vs Browser:](#nodejs-vs-browser)
     - [hello world on Node.js  server:](#hello-world-on-nodejs--server)
     - [Node Version Manager(NVM):](#node-version-managernvm)
+    - [Common Architecture:](#common-architecture)
 - [Part 2: Express:](#part-2-express)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
@@ -146,6 +147,31 @@ nvm install version // For install specific version
 nvm use version // For Switch different version
 npm ls // For see all install versions
 ```
+
+### Common Architecture:
+- Monolithic Architecture:
+One big application that contains everything (frontend, backend, database), if one part fails, the entire app may fail.
+Example: A simple e-commerce website where frontend + backend + database logic live in one project.
+
+Application split into many small, independent services. Easy to scale and maintain.
+Example: Netflix, Amazon, banking systems.
+
+- Client-Server Architecture:
+A client asks → server responds.
+Example: Your React frontend (client) talking to Node.js API (server).
+
+- 3-Tier Architecture(Most Common Web App Structure):
+Three Layers: Presentation Layers (UI) + Application Layers (backend) + Database layer
+Example: React → Node.js → MongoDB
+
+- MVC Architecture:
+Three Parts: Model (data and database logic) + View (UI) + Controller (Handles requests means calling model and returning response to view)
+
+- Event-Driven Architecture:
+Actions trigger events → other services react. Great for real-time application.
+
+- Serverless Architecture:
+You write code → cloud runs it on demand without managing servers.
 
 
 
