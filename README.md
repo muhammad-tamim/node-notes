@@ -8,6 +8,7 @@
     - [hello world on Node.js  server:](#hello-world-on-nodejs--server)
     - [Node Version Manager(NVM):](#node-version-managernvm)
     - [Common Architecture:](#common-architecture)
+    - [How Web Works:](#how-web-works)
 - [Part 2: Express:](#part-2-express)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
@@ -172,6 +173,13 @@ Actions trigger events → other services react. Great for real-time application
 
 - Serverless Architecture:
 You write code → cloud runs it on demand without managing servers.
+
+### How Web Works:
+
+![image](./images/how-web-works.webp)
+
+![image](./images/the-structure-of-a-url.png)
+
 
 
 
