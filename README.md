@@ -4,8 +4,8 @@
   - [Introduction:](#introduction)
     - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
     - [What can node.js do:](#what-can-nodejs-do)
-    - [Node.js hello on server:](#nodejs-hello-on-server)
     - [Node.js vs Browser:](#nodejs-vs-browser)
+    - [Node.js hello on server:](#nodejs-hello-on-server)
     - [Node Version Manager(NVM):](#node-version-managernvm)
     - [Common Architecture:](#common-architecture)
     - [How Web Works:](#how-web-works)
@@ -112,6 +112,16 @@ Note: Thread Pool: A set of background worker threads that handle heavy CPU-inte
 - Handle real-time data using WebSockets
 - Read, write, and manage files on the server
 - Build CLI (Command Line Interface) tools
+ 
+### Node.js vs Browser:
+Node.js and browsers both run JavaScript, but they have different environments and capabilities because Node.js is designed for server-side development, while browsers are for client-side applications.
+
+| Node.js                                             | Browser                                                     |
+| --------------------------------------------------- | ----------------------------------------------------------- |
+| provides APIs for file system, networking, and OS   | do not                                                      |
+| Global Object: global                               | Global Object:  window                                      |
+| support CommonJS (require) and ES6 modules (import) | support only ES6 module (import)                            |
+| uses npm/yarn for package management                | use CDN/bundlers(like webpack, vite) for package management |
 
 
 ### Node.js hello on server:
@@ -128,17 +138,7 @@ here,
   - Imports the build-in http module in Node.js, its allows us to handle http request
 - http.createServer(): Creates a new HTTP server.
 - res.writeHead(200, { 'Content-Type': 'text/html' }):Sends HTTP headers to the client and tells the browser that the response is html with ok(200) status.
-- res.end('Hello World!'): Sends the response body to the client and closes the connection. 
-
-### Node.js vs Browser:
-Node.js and browsers both run JavaScript, but they have different environments and capabilities because Node.js is designed for server-side development, while browsers are for client-side applications.
-
-| Node.js                                             | Browser                                                     |
-| --------------------------------------------------- | ----------------------------------------------------------- |
-| provides APIs for file system, networking, and OS   | do not                                                      |
-| Global Object: global                               | Global Object:  window                                      |
-| support CommonJS (require) and ES6 modules (import) | support only ES6 module (import)                            |
-| uses npm/yarn for package management                | use CDN/bundlers(like webpack, vite) for package management |
+- res.end('Hello World!'): Sends the response body to the client and closes the connection.
 
 
 ### Node Version Manager(NVM):
@@ -180,6 +180,7 @@ You write code → cloud runs it on demand without managing servers.
 ![image](./images/how-web-works.webp)
 
 ![image](./images/the-structure-of-a-url.png)
+
 
 
 
