@@ -15,6 +15,9 @@
     - [Node Package Manager (NPM):](#node-package-manager-npm)
     - [Node Version Manager(NVM):](#node-version-managernvm)
     - [Node.js package.json:](#nodejs-packagejson)
+    - [Node.js Core Modules:](#nodejs-core-modules)
+      - [HTTP Module:](#http-module)
+        - [Example:](#example)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -405,6 +408,87 @@ Script: Define a custom scripts that can be run with npm run <script-name>
   }
 }
 ```
+### Node.js Core Modules:
+#### HTTP Module:
+The http module allows us to create HTTP servers and make HTTP requests on node.js. This is the module behind Express.
+
+
+```js
+// Import the HTTP module
+const http = require('http');
+const port = 3000;
+
+// Create a server object
+const app = http.createServer((req, res) => {
+
+    // res.writeHead(200, { 'Content-Type': 'text/plain' });
+    // We can skip this header because Node.js automatically
+    // sets "Content-Type: text/plain" when sending a plain string.
+
+    res.end('Hello, World!\n');
+});
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+});
+```
+here,
+- http.createServer() - Creates a new HTTP server instance
+- The callback function is executed for each request with two parameters:
+  - req - request object containing data from the client 
+  - res - response object used to send data back to the client 
+- res.writeHead() - Sets the response status code and headers
+- res.end() - Sends the response and ends the connection
+- server.listen() - Starts the server on the specified port
+
+Note: req and res in Express are the SAME base objects from Node.js, but Express enhances them with many helpful methods and properties.
+
+- Node req: req.url, req.method, req.headers 
+  - Express req: req.params, req.query, req.body, req.path, req.ip, req,cookies
+
+- Node res: res.writeHead(), res.write(), res.end()
+  - Express res: res.send(), res.json(), res.status, res.redirect(), res.set(), res.download()
+
+
+##### Example: 
+```js
+const http = require('http');
+const { MongoClient } = require("mongodb");
+
+const port = 3000;
+const uri = "mongodb+srv://db-user:HSVPnZLwfnPGPjAB@cluster0.ec7ovco.mongodb.net/?appName=Cluster0";
+const client = new MongoClient(uri);
+
+async function run() {
+    await client.connect();
+    const coffeeCollection = client.db("coffeedb").collection('coffees');
+
+    const app = http.createServer(async (req, res) => {
+        if (req.method === "GET" && req.url === "/coffees") {
+            const result = await coffeeCollection.find().toArray();
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(result));
+        } else {
+            res.writeHead(404, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Not Found" }));
+        }
+    });
+
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
+}
+run().catch(console.dir);
+```
+
+Same example with express: 
+```js
+app.get('/coffees', async (req, res) => {
+  const result = await coffeeCollection.find().toArray()
+  res.send(result)
+})
+```
+
 
 # Part 2: Express.js:
 
