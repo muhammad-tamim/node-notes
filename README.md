@@ -10,6 +10,7 @@
     - [How Web Works:](#how-web-works)
   - [Node.js Modules:](#nodejs-modules)
     - [Types of Modules:](#types-of-modules)
+    - [Types of Module Systems:](#types-of-module-systems)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -185,6 +186,77 @@ There are 3 Types of modules:
 Nodes.js have several core modules like (fs, http, path, os). 
 2.  Local Modules (your created file):
 3.  Third party modules (install by npm or others package manager):
+
+### Types of Module Systems: 
+Since, js support 2 module system, node.js also support that two but node.js use common.js modules by default, if we want to use ES6 modules on node js, we have change `"type": "commonjs"` to `"type": "module"`
+- Common.js: 
+Uses require() to import and module.exports to export:
+
+```js
+// math.js
+function add(a, b) {
+    return a + b;
+}
+function sum(a, b) {
+    return a + b;
+}
+
+module.exports =  {add, sum};
+```
+```js
+const {add, sum} = require('./math');
+
+console.log(add(5, 3)); // 8
+console.log(sum(5, 3)); // 8
+```
+
+```js
+// math.js
+function add(a, b) {
+    return a + b;
+}
+function sum(a, b) {
+    return a + b;
+}
+
+exports.add =  add;
+exports.sum = sum;
+```
+```js
+const {add, sum} = require('./math');
+
+console.log(add(5, 3)); // 8
+console.log(sum(5, 3)); // 8
+```
+
+
+- ES6 Modules:
+Uses import to import and export to export.
+
+```js
+export function add(a, b) {
+    return a + b;
+}
+```
+```js
+import { add } from './math.js';
+
+console.log(add(5, 3)); // 8
+```
+
+Or Default Export (single export):
+
+```js
+export default function add(a, b) {
+    return a + b;
+}
+```
+
+```js
+import add from './math.js';
+
+console.log(add(5, 3)); // 8
+```
 
 
 # Part 2: Express.js:
