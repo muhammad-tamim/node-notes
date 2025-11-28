@@ -13,6 +13,7 @@
     - [Types of Modules:](#types-of-modules)
     - [Types of Module Systems:](#types-of-module-systems)
     - [Node Package Manager (NPM):](#node-package-manager-npm)
+    - [Node Version Manager(NVM):](#node-version-managernvm)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -281,6 +282,14 @@ npm install --save-dev <pkg> // Install a package as dev-dependencies.
 npm uninstall <pkg> // Remove a package
 npm install -g <pkg> // Install globally
 npm ls // List installed packages
+```
+### Node Version Manager(NVM):
+NVM used to install and use different Node.js versions: 
+
+```js
+nvm install version // For install specific version
+nvm use version // For Switch different version
+npm ls // For see all install versions
 ```
 
 # Part 2: Express.js:
