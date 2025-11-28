@@ -6,9 +6,10 @@
     - [What can node.js do:](#what-can-nodejs-do)
     - [Node.js vs Browser:](#nodejs-vs-browser)
     - [hello world on Node.js  server:](#hello-world-on-nodejs--server)
-    - [Node Version Manager(NVM):](#node-version-managernvm)
     - [Common Architecture:](#common-architecture)
     - [How Web Works:](#how-web-works)
+  - [Node.js Modules:](#nodejs-modules)
+    - [Types of Modules:](#types-of-modules)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -140,14 +141,6 @@ here,
 - res.end('Hello World!'): Sends the response body to the client and closes the connection.
 
 
-### Node Version Manager(NVM):
-NVM used to install and use different Node.js versions: 
-
-```js
-nvm install version // For install specific version
-nvm use version // For Switch different version
-npm ls // For see all install versions
-```
 
 ### Common Architecture:
 - Monolithic Architecture:
@@ -182,6 +175,16 @@ You write code → cloud runs it on demand without managing servers.
 
 
 
+
+## Node.js Modules:
+A module in Node.js is simply a reusable piece of code (a file or package) that you can import and use in other parts of your application.
+
+### Types of Modules:
+There are 3 Types of modules: 
+1. Core Modules (built-in):
+Nodes.js have several core modules like (fs, http, path, os). 
+2.  Local Modules (your created file):
+3.  Third party modules (install by npm or others package manager):
 
 
 # Part 2: Express.js:
