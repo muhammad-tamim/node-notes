@@ -12,6 +12,7 @@
   - [Node.js Modules:](#nodejs-modules)
     - [Types of Modules:](#types-of-modules)
     - [Types of Module Systems:](#types-of-module-systems)
+    - [Node Package Manager (NPM):](#node-package-manager-npm)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -269,6 +270,17 @@ export default function add(a, b) {
 import add from './math.js';
 
 console.log(add(5, 3)); // 8
+```
+### Node Package Manager (NPM): 
+Npm is default package manager for node.js packages.
+
+```js
+npm init -y // Create package.json quickly
+npm install <pkg> // Install a package 
+npm install --save-dev <pkg> // Install a package as dev-dependencies.
+npm uninstall <pkg> // Remove a package
+npm install -g <pkg> // Install globally
+npm ls // List installed packages
 ```
 
 # Part 2: Express.js:
