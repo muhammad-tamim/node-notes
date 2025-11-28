@@ -13,6 +13,7 @@
     - [Types of Module Systems:](#types-of-module-systems)
     - [Node Package Manager (NPM):](#node-package-manager-npm)
     - [Node Version Manager(NVM):](#node-version-managernvm)
+    - [Node.js package.json:](#nodejs-packagejson)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -279,6 +280,119 @@ nvm use version // For Switch different version
 npm ls // For see all install versions
 ```
 
+### Node.js package.json:
+package.json is a special file that describes your Node.js project. It contains information about your app, such as its name, version, dependencies, scripts, and more. 
+
+For Creating a package.json we used: 
+```js
+npm init -y
+```
+Inside the Package.json:
+```js
+{
+  "name": "javascripttest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs"
+}
+```
+
+when you install packages it added to the dependencies section:
+
+```js
+npm i express mongodb dotenv cors
+```
+```js
+{
+  "name": "javascripttest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
+  }
+}
+```
+
+and when you install a packages as a dev dependencies it added to the devDependencies section and its not used for projection, it's only install for development only:
+
+```js
+npm install --save-dev nodemon
+```
+
+```js
+{
+  "name": "javascripttest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22",
+    "jest": "^29.5.0",
+    "eslint": "^8.38.0"
+  }
+}
+```
+
+**Common package.json fields:**
+
+Script: Define a custom scripts that can be run with npm run <script-name>
+
+```js
+{
+  "name": "javascripttest",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0"
+  }
+}
+```
 
 # Part 2: Express.js:
 
