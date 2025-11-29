@@ -9,24 +9,29 @@
     - [How Web Works:](#how-web-works)
     - [Node Vs Express:](#node-vs-express)
     - [Common HTTP Status Codes:](#common-http-status-codes)
-  - [Node.js Modules:](#nodejs-modules)
+  - [Modules:](#modules)
     - [Types of Modules:](#types-of-modules)
     - [Types of Module Systems:](#types-of-module-systems)
     - [Node Package Manager (NPM):](#node-package-manager-npm)
     - [Node Version Manager(NVM):](#node-version-managernvm)
-    - [Node.js package.json:](#nodejs-packagejson)
-    - [Node.js Core Modules:](#nodejs-core-modules)
+    - [package.json:](#packagejson)
+    - [Core Modules:](#core-modules)
       - [HTTP Module:](#http-module)
         - [Example:](#example)
       - [fs module:](#fs-module)
-        - [create files:](#create-files)
-        - [Read files:](#read-files)
-        - [Update files:](#update-files)
-        - [Delete files:](#delete-files)
-        - [Create a folder (Directory):](#create-a-folder-directory)
-        - [Reading directory contents:](#reading-directory-contents)
+        - [Working with Files:](#working-with-files)
+          - [create files:](#create-files)
+          - [Read files:](#read-files)
+          - [Update files:](#update-files)
+          - [Delete files:](#delete-files)
         - [Renaming files:](#renaming-files)
-        - [Check if file exists:](#check-if-file-exists)
+        - [Checking files:](#checking-files)
+          - [Copying files:](#copying-files)
+          - [Watching Files:](#watching-files)
+        - [Working with Folder (Directory):](#working-with-folder-directory)
+          - [Create a folder:](#create-a-folder)
+          - [Delete a folder:](#delete-a-folder)
+          - [Reading folder contents:](#reading-folder-contents)
         - [Streams:](#streams)
           - [Piping:](#piping)
       - [path module:](#path-module)
@@ -209,7 +214,7 @@ Note:
 - 4xx → Client mistake
 - 5xx → Server mistake
 
-## Node.js Modules:
+## Modules:
 A module in Node.js is simply a reusable piece of code (a file or package) that you can import and use in other parts of your application.
 
 ### Types of Modules:
@@ -307,7 +312,7 @@ nvm install version // For install specific version
 nvm use version // For Switch different version
 npm ls // For see all install versions
 ```
-### Node.js package.json:
+### package.json:
 package.json is a special file that describes your Node.js project. It contains information about your app, such as its name, version, dependencies, scripts, and more. 
 
 For Creating a package.json we used: 
@@ -420,7 +425,7 @@ Script: Define a custom scripts that can be run with npm run <script-name>
   }
 }
 ```
-### Node.js Core Modules:
+### Core Modules:
 #### HTTP Module:
 The http module allows us to create HTTP servers and make HTTP requests on node.js. This is the module behind Express.
 
@@ -501,13 +506,16 @@ app.get('/coffees', async (req, res) => {
 })
 ```
 #### fs module:
-The fs module allows you to do CRUD operation and manage files & folders from your Node.js server.
+The fs module allows you to manage files and folders directly from your Node.js server.
+
 You can use it in two ways:
 - Synchronous (bloc the thread) – using fs.writeFileSync() ,fs.readFileSync() etc. 
 - Asynchronous (non-blocking) – using fs.writeFile() ,fs.readFile() etc
 As a backend developer, always prefer asynchronous because Node.js is single-threaded.
 
-##### create files:
+##### Working with Files:
+
+###### create files:
 - fs.writeFile(): Creates new file OR overwrites existing file
 
 ```js
@@ -519,7 +527,7 @@ fs.writeFile('data.txt', 'Hello Tamim!', (err) => {
 });
 ```
 
-##### Read files:
+###### Read files:
 
 ```js
 const fs = require('fs');
@@ -533,7 +541,7 @@ fs.readFile('data.txt', 'utf8', (err, data) => {
 });
 ```
 
-##### Update files:
+###### Update files:
 - fs.appendFile: Adds new content without removing old content.
 
 ```js
@@ -545,7 +553,7 @@ fs.appendFile('data.txt', '\nNew line added!', (err) => {
 });
 ```
 
-##### Delete files:
+###### Delete files:
 
 ```js
 const fs = require('fs');
@@ -556,7 +564,65 @@ fs.unlink('data.txt', (err) => {
 });
 ```
 
-##### Create a folder (Directory):
+##### Renaming files:
+
+```js
+const fs = require('fs');
+
+fs.rename('old.txt', 'new.txt', (err) => {
+    if (err) console.log(err);
+    else console.log('File renamed!');
+});
+```
+
+##### Checking files:
+
+```js
+const fs = require('fs');
+
+fs.access('data.txt', fs.constants.F_OK, (err) => {
+    if (err) {
+        console.log("File does NOT exist");
+    } else {
+        console.log("File exists");
+    }
+});
+```
+
+```js
+const fs = require('fs');
+
+fs.stat('text.txt', (err, stats) => {
+    if (err) return console.log(err);
+
+    console.log(stats.isFile());  // true or false
+    console.log(stats.isDirectory());
+});
+```
+
+###### Copying files: 
+
+```js
+const fs = require('fs');
+
+fs.copyFile('a.txt', 'backup.txt', err => {
+    if (err) console.log(err);
+});
+```
+
+###### Watching Files:
+
+```js
+const fs = require('fs');
+
+fs.watch('notes.txt', () => {
+    console.log('File changed!');
+});
+```
+
+##### Working with Folder (Directory):
+
+###### Create a folder:
 
 ```js
 const fs = require('fs');
@@ -577,7 +643,15 @@ fs.mkdir('a/b/c', { recursive: true }, (err) => {
 });
 ```
 
-##### Reading directory contents:
+###### Delete a folder: 
+
+```js
+const fs = require('fs');
+
+fs.rmdir('myFolder', { recursive: true }, err => {});
+```
+
+###### Reading folder contents:
 
 ```js
 const fs = require('fs');
@@ -588,28 +662,6 @@ fs.readdir('myFolder', (err, files) => {
 });
 ```
 
-##### Renaming files:
-
-```js
-const fs = require('fs');
-
-fs.rename('old.txt', 'new.txt', (err) => {
-    if (err) console.log(err);
-    else console.log('File renamed!');
-});
-```
-
-##### Check if file exists:
-
-```js
-fs.access('data.txt', fs.constants.F_OK, (err) => {
-    if (err) {
-        console.log("File does NOT exist");
-    } else {
-        console.log("File exists");
-    }
-});
-```
 
 ##### Streams: 
 Streams let you read/write large files without loading the whole file into memory.
@@ -754,7 +806,6 @@ const messyPath = '/users//john/../jane/./documents/file.txt';
 console.log(path.normalize(messyPath)); 
 // '/users/jane/documents/file.txt'
 ```
-
 
 # Part 2: Express.js:
 
