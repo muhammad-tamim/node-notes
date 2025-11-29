@@ -1,12 +1,9 @@
-const fs = require('fs');
+// const path = require('path');
 
-// create  
-const writeStream = fs.createWriteStream('output.txt');
-writeStream.write('Writing using stream...');
-writeStream.end();
+console.log(__dirname);  // directory name of current file
+console.log(__filename); // full path including file name
 
-// read
-const readStream = fs.createReadStream('output.txt', 'utf8');
-readStream.on('data', (chunk) => {
-    console.log("Chunk received:", chunk);
-});
+/*
+/home/muhammad-tamim/programming/notes/node-notes
+/home/muhammad-tamim/programming/notes/node-notes/index.js
+*/

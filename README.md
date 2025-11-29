@@ -29,6 +29,7 @@
         - [Check if file exists:](#check-if-file-exists)
         - [Streams:](#streams)
           - [Piping:](#piping)
+      - [path module:](#path-module)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -640,6 +641,120 @@ here,
 - Automatically send each chunk to the write stream
 - Automatically handle backpressure
 - Automatically close the write stream when reading is done
+#### path module:
+The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
+
+Key Methods: 
+
+- path.join: Joins multiple path together:
+
+```js
+const path = require('path');
+
+const fullPath = path.join('/users', 'john', 'documents', 'file.txt');
+console.log(fullPath);
+// '/users/john/documents/file.txt' on linux and macOS
+// '\users\john\documents\file.txt' on Windows
+```
+
+- path.resolve(): Returns the absolute path starting from root (/):
+
+```js
+const path = require('path');
+
+const result = path.resolve('folder', 'file.txt');
+console.log(result); // /home/muhammad-tamim/programming/notes/node-notes/folder/file.txt
+```
+
+- path.basename() - Returns the last portion of a path, means the file name:
+
+```js
+const path = require('path');
+
+console.log(path.basename('/users/john/file.txt')); // 'file.txt'
+console.log(path.basename('/users/john/file.txt', '.txt')); // 'file'
+```
+
+- path.dirname() - Get Parent Folder:
+
+```js
+const path = require('path');
+
+console.log(path.dirname('/folder/folder-2/file.txt')); // /folder/folder-2
+```
+
+- path.extname() - Returns the file extension:
+
+```js
+console.log(path.extname('file.txt')); // '.txt'
+console.log(path.extname('archive.tar.gz')); // '.gz'
+```
+
+- path.parse() - Break Path into objects
+
+```js
+const path = require('path');
+
+console.log(path.parse('/folder/folder-2/file.txt'));
+
+/*
+{
+  root: '/',
+  dir: '/folder/folder-2',
+  base: 'file.txt',
+  ext: '.txt',
+  name: 'file'
+}
+*/
+```
+
+- path.format() - Creates a path string from an object (opposite of parse):
+
+```js
+const path = require('path');
+
+const pathObj = {
+    dir: '/users/john',
+    base: 'file.txt'
+};
+console.log(path.format(pathObj)); // '/users/john/file.txt'
+```
+
+Note:__dirname and __filename are special Node variables and they don't depend fs module
+
+```js
+console.log(__dirname);  // directory name of current file
+console.log(__filename); // full path including file name
+
+/*
+/home/muhammad-tamim/programming/notes/node-notes
+/home/muhammad-tamim/programming/notes/node-notes/index.js
+*/
+```
+
+Example: 
+
+```js
+const path = require('path');
+
+// Get current file's directory
+const currentDir = __dirname;
+
+// Build path to a config file
+const configPath = path.join(currentDir, 'config', 'settings.json');
+
+// Extract information
+console.log('Full path:', configPath);
+console.log('Directory:', path.dirname(configPath));
+console.log('Filename:', path.basename(configPath));
+console.log('Extension:', path.extname(configPath));
+
+// Normalize messy paths
+const messyPath = '/users//john/../jane/./documents/file.txt';
+console.log(path.normalize(messyPath)); 
+// '/users/jane/documents/file.txt'
+```
+
 
 # Part 2: Express.js:
 
