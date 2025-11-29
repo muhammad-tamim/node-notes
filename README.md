@@ -18,6 +18,17 @@
     - [Node.js Core Modules:](#nodejs-core-modules)
       - [HTTP Module:](#http-module)
         - [Example:](#example)
+      - [fs module:](#fs-module)
+        - [create files:](#create-files)
+        - [Read files:](#read-files)
+        - [Update files:](#update-files)
+        - [Delete files:](#delete-files)
+        - [Create a folder (Directory):](#create-a-folder-directory)
+        - [Reading directory contents:](#reading-directory-contents)
+        - [Renaming files:](#renaming-files)
+        - [Check if file exists:](#check-if-file-exists)
+        - [Streams:](#streams)
+          - [Piping:](#piping)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -488,7 +499,147 @@ app.get('/coffees', async (req, res) => {
   res.send(result)
 })
 ```
+#### fs module:
+The fs module allows you to do CRUD operation and manage files & folders from your Node.js server.
+You can use it in two ways:
+- Synchronous (bloc the thread) – using fs.writeFileSync() ,fs.readFileSync() etc. 
+- Asynchronous (non-blocking) – using fs.writeFile() ,fs.readFile() etc
+As a backend developer, always prefer asynchronous because Node.js is single-threaded.
 
+##### create files:
+- fs.writeFile(): Creates new file OR overwrites existing file
+
+```js
+const fs = require('fs');
+
+fs.writeFile('data.txt', 'Hello Tamim!', (err) => {
+    if (err) console.log(err);
+    else console.log("File written successfully!");
+});
+```
+
+##### Read files:
+
+```js
+const fs = require('fs');
+
+fs.readFile('data.txt', 'utf8', (err, data) => {
+    if (err) {
+        console.log("Error reading file:", err);
+        return;
+    }
+    console.log(data);
+});
+```
+
+##### Update files:
+- fs.appendFile: Adds new content without removing old content.
+
+```js
+const fs = require('fs');
+
+fs.appendFile('data.txt', '\nNew line added!', (err) => {
+    if (err) console.log(err);
+    else console.log('Data appended!');
+});
+```
+
+##### Delete files:
+
+```js
+const fs = require('fs');
+
+fs.unlink('data.txt', (err) => {
+    if (err) console.log(err);
+    else console.log('File deleted!');
+});
+```
+
+##### Create a folder (Directory):
+
+```js
+const fs = require('fs');
+
+fs.mkdir('myFolder', (err) => {
+    if (err) console.log(err);
+    else console.log('Folder created!');
+});
+```
+For Nested folder:
+
+```js
+const fs = require('fs');
+
+fs.mkdir('a/b/c', { recursive: true }, (err) => {
+    if (err) console.log(err);
+    else console.log('Nested folders created!');
+});
+```
+
+##### Reading directory contents:
+
+```js
+const fs = require('fs');
+
+fs.readdir('myFolder', (err, files) => {
+    if (err) console.log(err);
+    else console.log(files); // returns array of filenames
+});
+```
+
+##### Renaming files:
+
+```js
+const fs = require('fs');
+
+fs.rename('old.txt', 'new.txt', (err) => {
+    if (err) console.log(err);
+    else console.log('File renamed!');
+});
+```
+
+##### Check if file exists:
+
+```js
+fs.access('data.txt', fs.constants.F_OK, (err) => {
+    if (err) {
+        console.log("File does NOT exist");
+    } else {
+        console.log("File exists");
+    }
+});
+```
+
+##### Streams: 
+Streams let you read/write large files without loading the whole file into memory.
+
+```js
+const fs = require('fs');
+
+// create  
+const writeStream = fs.createWriteStream('output.txt');
+writeStream.write('Writing using stream...');
+writeStream.end();
+
+// read
+const readStream = fs.createReadStream('output.txt', 'utf8');
+readStream.on('data', (chunk) => {
+    console.log("Chunk received:", chunk);
+});
+```
+
+###### Piping: 
+Piping means connecting one stream to another stream so data flows automatically from source → destination.
+
+```js
+fs.createReadStream('input.txt')
+  .pipe(fs.createWriteStream('output.txt'));
+```
+here, 
+- Read data chunk by chunk from input.txt
+- Automatically send each chunk to the write stream
+- Automatically handle backpressure
+- Automatically close the write stream when reading is done
 
 # Part 2: Express.js:
 
