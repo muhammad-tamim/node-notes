@@ -36,6 +36,7 @@
           - [Piping:](#piping)
       - [path module:](#path-module)
       - [OS Module:](#os-module)
+      - [URL Module:](#url-module)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -1118,6 +1119,92 @@ function realTimeSystemMonitor() {
 }
 
 realTimeSystemMonitor(); 
+```
+
+#### URL Module:
+The url module helps you parse URLs, build URLs, and work with query strings
+
+```js
+const { URL } = require('url');
+
+const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
+console.log(myUrl);
+
+/*
+URL {
+  href: 'https://example.com/products?category=shoes&sort=asc',
+  origin: 'https://example.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'example.com',
+  hostname: 'example.com',
+  port: '',
+  pathname: '/products',
+  search: '?category=shoes&sort=asc',
+  searchParams: URLSearchParams { 'category' => 'shoes', 'sort' => 'asc' },
+  hash: ''
+}
+*/
+```
+- Work wit query parameters: 
+
+```js
+const { URL } = require('url');
+
+const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
+
+console.log(myUrl.searchParams.get('category'));  // shoes
+console.log(myUrl.searchParams.has('sort'));  // true
+
+myUrl.searchParams.append('page', '2'); //  add new parameter
+console.log(myUrl.href); // https://example.com/products?category=shoes&sort=asc&page=2
+
+myUrl.searchParams.set('sort', 'desc'); // update 
+console.log(myUrl.href); // https://example.com/products?category=shoes&sort=desc&page=2
+
+myUrl.searchParams.delete('category');
+console.log(myUrl.href); // https://example.com/products?sort=desc&page=2
+
+// both gives full url
+console.log(myUrl.toString());
+console.log(myUrl.href);
+```
+
+- URL + Node.js HTTP Module (Important!):
+
+```js
+const http = require('http');
+const { URL } = require('url');
+
+http.createServer((req, res) => {
+    const myUrl = new URL(req.url, `http://${req.headers.host}`);
+
+    console.log(myUrl.pathname);
+    console.log(myUrl.searchParams.get('id'));
+
+    res.end('ok');
+}).listen(3000);
+
+// Example request: http://localhost:3000/products?id=5
+/*
+/products
+5
+*/
+```
+
+- Build dynamic URL:
+
+```js
+const { URL } = require('url');
+
+const apiUrl = new URL('https://api.example.com/search');
+
+apiUrl.searchParams.append('q', 'node js tutorial');
+apiUrl.searchParams.append('page', '1');
+apiUrl.searchParams.append('limit', '10');
+
+console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
 ```
 
 # Part 2: Express.js:

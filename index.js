@@ -1,22 +1,9 @@
-const os = require('os');
+const { URL } = require('url');
 
-function realTimeSystemMonitor() {
-    setInterval(() => {
-        const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
-        const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
-        const uptime = (os.uptime() / 3600).toFixed(2);
+const apiUrl = new URL('https://api.example.com/search');
 
-        console.clear();
-        console.log('=== SYSTEM MONITOR ===');
-        console.log(`Time: ${new Date().toLocaleTimeString()}`);
-        console.log(`Free Memory: ${freeMem} GB / ${totalMem} GB`);
-        console.log(`Uptime: ${uptime} hours`);
+apiUrl.searchParams.append('q', 'node js tutorial');
+apiUrl.searchParams.append('page', '1');
+apiUrl.searchParams.append('limit', '10');
 
-        const loadAvg = os.loadavg();
-        if (loadAvg) {
-            console.log(`Load Average: ${loadAvg.map(l => l.toFixed(2)).join(', ')}`);
-        }
-    }, 2000);
-}
-
-realTimeSystemMonitor(); 
+console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
