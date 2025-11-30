@@ -221,18 +221,18 @@ Note:
 ### How to take input in node.js like C, C++:
 
 ```js
-const arg = process.argv;
+const argv = process.argv;
 
-const name = arg[2]
-const age = arg[3]
+const name = argv[2]
+const age = argv[3]
 
-console.log(arg)
+console.log(argv)
 console.log(name, age)
 
 /*
-process.arg[0] = node path
-process.arg[1] = file path
-process.arg[2] = first actual input value
+process.argv[0] = node path
+process.argv[1] = file path
+process.argv[2] = first actual input value
 
 [
   '/home/muhammad-tamim/.nvm/versions/node/v24.4.1/bin/node',
