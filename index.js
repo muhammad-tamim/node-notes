@@ -1,32 +1,22 @@
 const os = require('os');
 
-console.log(os.platform());
-console.log(os.type());
-console.log(os.release());
-console.log(os.version());
+function realTimeSystemMonitor() {
+    setInterval(() => {
+        const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
+        const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
+        const uptime = (os.uptime() / 3600).toFixed(2);
 
-// console.log(`Number of CPUs: ${cpus.length}`);
-// console.log(cpus[0]);
+        console.clear();
+        console.log('=== SYSTEM MONITOR ===');
+        console.log(`Time: ${new Date().toLocaleTimeString()}`);
+        console.log(`Free Memory: ${freeMem} GB / ${totalMem} GB`);
+        console.log(`Uptime: ${uptime} hours`);
 
-const totalMem = os.totalmem();
-console.log(`Total Memory: ${(totalMem / 1024 / 1024 / 1024).toFixed(2)} GB`);
+        const loadAvg = os.loadavg();
+        if (loadAvg) {
+            console.log(`Load Average: ${loadAvg.map(l => l.toFixed(2)).join(', ')}`);
+        }
+    }, 2000);
+}
 
-const freeMem = os.freemem();
-console.log(`Free Memory: ${(freeMem / 1024 / 1024 / 1024).toFixed(2)} GB`);
-
-console.log(os.homedir());
-console.log(os.tmpdir());
-
-const userInfo = os.userInfo();
-console.log(userInfo);
-
-console.log(os.hostname());
-
-const interfaces = os.networkInterfaces();
-console.log(interfaces);
-
-const uptime = os.uptime();
-console.log(`System uptime: ${(uptime / 3600).toFixed(2)} hours`);
-
-const load = os.loadavg();
-console.log(`Load average: ${load}`);
+realTimeSystemMonitor(); 

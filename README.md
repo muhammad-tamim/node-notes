@@ -35,6 +35,7 @@
         - [Streams:](#streams)
           - [Piping:](#piping)
       - [path module:](#path-module)
+      - [OS Module:](#os-module)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -805,6 +806,318 @@ console.log('Extension:', path.extname(configPath));
 const messyPath = '/users//john/../jane/./documents/file.txt';
 console.log(path.normalize(messyPath)); 
 // '/users/jane/documents/file.txt'
+```
+#### OS Module: 
+The os module provides operating system-related utility methods and properties. It's useful for getting information about the system your Node.js application is running on.The module gives you information about (CPU, Memory, User, Network, Platform, System uptime etc)
+
+- System Information: 
+
+```js
+const os = require('os');
+
+console.log(os.platform()); // Output: 'darwin' (macOS), 'win32' (Windows), 'linux', etc.
+console.log(os.type()); // Output: 'Linux', 'Darwin', 'Windows_NT'
+console.log(os.arch()); // Output: 'x64', 'arm', 'arm64', 'ia32'
+console.log(os.release()); // Output: '10.0.19042' (Windows), '6.14.0-36-generic' (Linux)
+console.log(`System uptime: ${os.uptime()} seconds`); // System uptime: 31937.63 seconds
+console.log(`Uptime: ${(os.uptime() / 3600).toFixed(2)} hours`);
+```
+
+- CPU Information: 
+
+```js
+const os = require('os');
+
+console.log(os.cpus());
+
+/*
+[
+  {
+    model: 'Intel(R) Core(TM) i3-3217U CPU @ 1.80GHz',
+    speed: 1795,
+    times: { user: 1485240, nice: 1260, sys: 321220, idle: 5200940, irq: 0 }
+  },
+  {
+    model: 'Intel(R) Core(TM) i3-3217U CPU @ 1.80GHz',
+    speed: 1795,
+    times: { user: 1451820, nice: 540, sys: 305600, idle: 5244270, irq: 0 }
+  },
+  {
+    model: 'Intel(R) Core(TM) i3-3217U CPU @ 1.80GHz',
+    speed: 1795,
+    times: { user: 1436820, nice: 2780, sys: 297600, idle: 5271690, irq: 0 }
+  },
+  {
+    model: 'Intel(R) Core(TM) i3-3217U CPU @ 1.80GHz',
+    speed: 1795,
+    times: { user: 1490470, nice: 760, sys: 301340, idle: 5222880, irq: 0 }
+  }
+]
+*/
+```
+
+```js
+const os = require('os');
+
+console.log(`Number of CPUs: ${os.cpus().length}`); // Number of CPUs: 4
+console.log(`CPU Speed: ${os.cpus()[0].speed} MHz`); // CPU Speed: 1795 MHz
+```
+
+```js
+// Calculate cpu usage:
+
+const os = require('os');
+
+function getCPUUsage() {
+    const cpus = os.cpus();
+
+    let totalIdle = 0;
+    let totalTick = 0;
+
+    cpus.forEach(cpu => {
+        for (let type in cpu.times) {
+            totalTick += cpu.times[type];
+        }
+        totalIdle += cpu.times.idle;
+    });
+
+    const idle = totalIdle / cpus.length;
+    const total = totalTick / cpus.length;
+    const usage = 100 - (100 * idle / total);
+
+    return usage.toFixed(2);
+}
+
+console.log(`CPU Usage: ${getCPUUsage()}%`);
+```
+
+- Memory Information:
+
+```js
+const os = require('os');
+
+console.log(`Total Memory: ${(os.totalmem() / 1024 / 1024 / 1024).toFixed(2)} GB`); // Total Memory: 3.69 GB
+console.log(`Used Memory: ${((os.totalmem() - os.freemem()) / 1024 / 1024 / 1024).toFixed(2)} GB`); 
+// Used Memory: 2.95 GB
+console.log(`Free Memory: ${(os.freemem() / 1024 / 1024 / 1024).toFixed(2)} GB`); //  Free Memory: 0.68 GB
+```
+
+- User Information:
+
+```js
+const os = require('os');
+
+console.log(`Username: ${os.userInfo().username}`); // Username: muhammad-tamim
+console.log(`Home Directory: ${os.userInfo().homedir}`); // Home Directory: /home/muhammad-tamim
+console.log(`Shell: ${os.userInfo().shell}`); // Shell: /bin/bash
+console.log(`UID: ${os.userInfo().uid}`); // UID: 1000
+console.log(`GID: ${os.userInfo().gid}`); // GID: 1000
+```
+
+- Directory Paths:
+
+```js
+const os = require('os');
+
+console.log(os.homedir()); // Output: '/home/username' (Linux), 'C:\Users\username' (Windows)
+console.log(os.tmpdir()); // Output: '/tmp' (Linux), 'C:\Users\username\AppData\Local\Temp' (Windows)
+```
+
+- Network Interfaces:
+
+```js
+const os = require('os');
+
+console.log(os.networkInterfaces());
+
+/*
+{
+  lo: [
+    {
+      address: '127.0.0.1',
+      netmask: '255.0.0.0',
+      family: 'IPv4',
+      mac: '00:00:00:00:00:00',
+      internal: true,
+      cidr: '127.0.0.1/8'
+    },
+    {
+      address: '::1',
+      netmask: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff',
+      family: 'IPv6',
+      mac: '00:00:00:00:00:00',
+      internal: true,
+      cidr: '::1/128',
+      scopeid: 0
+    }
+  ],
+  wlp6s0: [
+    {
+      address: '192.168.43.147',
+      netmask: '255.255.255.0',
+      family: 'IPv4',
+      mac: '64:5a:04:58:42:f7',
+      internal: false,
+      cidr: '192.168.43.147/24'
+    },
+    {
+      address: 'fe80::6274:3e86:810e:d97e',
+      netmask: 'ffff:ffff:ffff:ffff::',
+      family: 'IPv6',
+      mac: '64:5a:04:58:42:f7',
+      internal: false,
+      cidr: 'fe80::6274:3e86:810e:d97e/64',
+      scopeid: 3
+    }
+  ]
+}
+*/
+```
+
+```js
+const os = require('os');
+
+function getIPv4Addresses() {
+    const interfaces = os.networkInterfaces();
+    const addresses = [];
+
+    for (let interfaceName in interfaces) {
+        for (let iface of interfaces[interfaceName]) {
+            if (iface.family === 'IPv4' && !iface.internal) {
+                addresses.push({
+                    interface: interfaceName,
+                    address: iface.address
+                });
+            }
+        }
+    }
+
+    return addresses;
+}
+
+console.log(getIPv4Addresses()); // [ { interface: 'wlp6s0', address: '192.168.43.147' } ]
+```
+
+- system Constants:
+
+```js
+const os = require('os');
+
+console.log(JSON.stringify(os.EOL)); // Linux/macOS → \n, Windows → \r\n
+```
+
+- Hostname:
+
+```js
+const os = require('os');
+
+console.log(os.hostname()); // Inspiron-3421
+```
+
+Examples:
+
+```js
+const os = require('os');
+
+function displaySystemInfo() {
+    console.log('=== SYSTEM INFORMATION ===\n');
+
+    // OS Info
+    console.log('Operating System:', os.type(), os.release());
+    console.log('Platform:', os.platform());
+    console.log('Architecture:', os.arch());
+    console.log('Hostname:', os.hostname());
+    console.log('Uptime:', (os.uptime() / 3600).toFixed(2), 'hours\n');
+
+    // CPU Info
+    const cpus = os.cpus();
+    console.log(`CPU: ${cpus[0].model}`);
+    console.log(`Cores: ${cpus.length}`);
+    console.log(`Speed: ${cpus[0].speed} MHz\n`);
+
+    // Memory Info
+    const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
+    const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
+    const usedMem = (totalMem - freeMem).toFixed(2);
+    console.log(`Memory: ${usedMem} GB / ${totalMem} GB used`);
+    console.log(`Free Memory: ${freeMem} GB\n`);
+
+    // User Info
+    const user = os.userInfo();
+    console.log('User:', user.username);
+    console.log('Home:', user.homedir);
+}
+
+displaySystemInfo();
+```
+
+```js
+const os = require('os');
+
+function checkSystemRequirements() {
+    const requirements = {
+        minMemoryGB: 4,
+        minCPUs: 2,
+        supportedPlatforms: ['linux', 'darwin', 'win32']
+    };
+
+    const totalMemoryGB = os.totalmem() / 1024 / 1024 / 1024;
+    const cpuCount = os.cpus().length;
+    const platform = os.platform();
+
+    console.log('Checking system requirements...\n');
+
+    if (totalMemoryGB < requirements.minMemoryGB) {
+        console.log(`❌ Insufficient memory: ${totalMemoryGB.toFixed(2)} GB (need ${requirements.minMemoryGB} GB)`);
+        return false;
+    } else {
+        console.log(`✅ Memory: ${totalMemoryGB.toFixed(2)} GB`);
+    }
+
+    if (cpuCount < requirements.minCPUs) {
+        console.log(`❌ Insufficient CPUs: ${cpuCount} (need ${requirements.minCPUs})`);
+        return false;
+    } else {
+        console.log(`✅ CPUs: ${cpuCount}`);
+    }
+
+    if (!requirements.supportedPlatforms.includes(platform)) {
+        console.log(`❌ Unsupported platform: ${platform}`);
+        return false;
+    } else {
+        console.log(`✅ Platform: ${platform}`);
+    }
+
+    console.log('\n✅ All requirements met!');
+    return true;
+}
+
+checkSystemRequirements();
+```
+
+```js
+const os = require('os');
+
+function realTimeSystemMonitor() {
+    setInterval(() => {
+        const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
+        const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
+        const uptime = (os.uptime() / 3600).toFixed(2);
+
+        console.clear();
+        console.log('=== SYSTEM MONITOR ===');
+        console.log(`Time: ${new Date().toLocaleTimeString()}`);
+        console.log(`Free Memory: ${freeMem} GB / ${totalMem} GB`);
+        console.log(`Uptime: ${uptime} hours`);
+
+        const loadAvg = os.loadavg();
+        if (loadAvg) {
+            console.log(`Load Average: ${loadAvg.map(l => l.toFixed(2)).join(', ')}`);
+        }
+    }, 2000);
+}
+
+realTimeSystemMonitor(); 
 ```
 
 # Part 2: Express.js:
