@@ -37,6 +37,7 @@
       - [path module:](#path-module)
       - [OS Module:](#os-module)
       - [URL Module:](#url-module)
+      - [Crypto Module:](#crypto-module)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -1205,6 +1206,48 @@ apiUrl.searchParams.append('page', '1');
 apiUrl.searchParams.append('limit', '10');
 
 console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
+```
+
+#### Crypto Module:
+The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
+
+- Hashing:
+
+```js
+const crypto = require('crypto');
+
+// Simple hash
+const hash = crypto.createHash('sha256');
+hash.update('Hello World');
+const digest = hash.digest('hex'); // hex, base64, binary
+console.log(digest); // Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+
+// One-liner
+const quickHash = crypto.createHash('sha256').update('Hello World').digest('hex');
+console.log(quickHash); // Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+```
+
+- Generate Random Values: used for OTP, Verification tokens, password reset links, session ides etc
+
+```js
+const crypto = require('crypto');
+
+console.log(crypto.randomBytes(16).toString('hex')); // b06d050428688aa7d835bcb76ade2beb
+```
+
+```js
+const crypto = require('crypto');
+
+const otp = crypto.randomInt(100000, 999999);
+console.log(otp); // 963880
+```
+
+- Generate UUID (random ID):
+
+```js
+const crypto = require('crypto');
+
+console.log(crypto.randomUUID()); // 136dfef5-b9d7-4b88-943f-519487ecba33
 ```
 
 # Part 2: Express.js:

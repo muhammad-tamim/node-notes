@@ -1,9 +1,4 @@
-const { URL } = require('url');
+const crypto = require('crypto');
 
-const apiUrl = new URL('https://api.example.com/search');
-
-apiUrl.searchParams.append('q', 'node js tutorial');
-apiUrl.searchParams.append('page', '1');
-apiUrl.searchParams.append('limit', '10');
-
-console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
+const otp = crypto.randomInt(100000, 999999);
+console.log(otp);
