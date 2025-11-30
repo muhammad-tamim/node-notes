@@ -1235,20 +1235,81 @@ console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&p
 #### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
 
-- Hashing:
+- Hashing (sha256, sha512):
 
 ```js
 const crypto = require('crypto');
 
-// Simple hash
 const hash = crypto.createHash('sha256');
 hash.update('Hello World');
 const digest = hash.digest('hex'); // hex, base64, binary
-console.log(digest); // Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+console.log(digest); // a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
 
-// One-liner
-const quickHash = crypto.createHash('sha256').update('Hello World').digest('hex');
-console.log(quickHash); // Output: a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+// sha256
+const hash1 = crypto.createHash('sha256').update('Hello World').digest('hex');
+console.log(hash1); // a591a6d40bf420404a011733cfb7b190d62c65bf0bcda32b57b277d9ad9f146e
+
+// sha512
+const hash2 = crypto.createHash('sha512').update('Hello World').digest('hex');
+console.log(hash2);
+// 2c74fd17edafd80e8447b0d46741ee243b7eb74dd2149a0ab1b9246fb30382f27e853d8585719e0e67cbda0daa8f51671064615d645ae27acb15bfb1447f459b
+```
+
+With Secret key(stripe, bkash etc):
+
+```js
+const crypto = require("crypto");
+
+const secret = "mySecretKey123";
+const message = "hello world";
+
+const hmac = crypto.createHmac("sha256", secret)
+                   .update(message)
+                   .digest("hex");
+
+console.log(hmac);
+```
+
+
+- Encrypt and Decrypt:
+
+```js
+const crypto = require("crypto");
+
+const algorithm = "aes-256-cbc";
+const key = crypto.randomBytes(32);  // Secret key (must be 32 bytes)
+const iv = crypto.randomBytes(16);   // Initialization vector (16 bytes)
+
+// Encrypt Function
+function encrypt(text) {
+    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    let encrypted = cipher.update(text, "utf8", "hex");
+    encrypted += cipher.final("hex");
+    return encrypted;  // unreadable string
+}
+
+// Decrypt Function
+function decrypt(encryptedText) {
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    let decrypted = decipher.update(encryptedText, "hex", "utf8");
+    decrypted += decipher.final("utf8");
+    return decrypted;  // original text
+}
+
+// Example
+const message = "Hello Tamim!";
+const encrypted = encrypt(message);
+const decrypted = decrypt(encrypted);
+
+console.log("Original:", message);
+console.log("Encrypted:", encrypted);
+console.log("Decrypted:", decrypted);
+
+/*
+Original: Hello Tamim!
+Encrypted: c4deb1169e947cf9e6abcab85c4b9b29
+Decrypted: Hello Tamim!
+*/
 ```
 
 - Generate Random Values: used for OTP, Verification tokens, password reset links, session ides etc
@@ -1265,8 +1326,6 @@ const crypto = require('crypto');
 const otp = crypto.randomInt(100000, 999999);
 console.log(otp); // 963880
 ```
-
-- Generate UUID (random ID):
 
 ```js
 const crypto = require('crypto');
