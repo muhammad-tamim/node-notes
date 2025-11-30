@@ -19,6 +19,8 @@
     - [Core Modules:](#core-modules)
       - [HTTP Module:](#http-module)
         - [Example:](#example)
+      - [URL Module:](#url-module)
+      - [path module:](#path-module)
       - [fs module:](#fs-module)
         - [Working with Files:](#working-with-files)
           - [create files:](#create-files)
@@ -35,9 +37,7 @@
           - [Reading folder contents:](#reading-folder-contents)
         - [Streams:](#streams)
           - [Piping:](#piping)
-      - [path module:](#path-module)
       - [OS Module:](#os-module)
-      - [URL Module:](#url-module)
       - [Crypto Module:](#crypto-module)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
@@ -534,6 +534,204 @@ app.get('/coffees', async (req, res) => {
   res.send(result)
 })
 ```
+#### URL Module:
+The url module helps you parse URLs, build URLs, and work with query strings
+
+```js
+const { URL } = require('url');
+
+const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
+console.log(myUrl);
+
+/*
+URL {
+  href: 'https://example.com/products?category=shoes&sort=asc',
+  origin: 'https://example.com',
+  protocol: 'https:',
+  username: '',
+  password: '',
+  host: 'example.com',
+  hostname: 'example.com',
+  port: '',
+  pathname: '/products',
+  search: '?category=shoes&sort=asc',
+  searchParams: URLSearchParams { 'category' => 'shoes', 'sort' => 'asc' },
+  hash: ''
+}
+*/
+```
+- Work wit query parameters: 
+
+```js
+const { URL } = require('url');
+
+const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
+
+console.log(myUrl.searchParams.get('category'));  // shoes
+console.log(myUrl.searchParams.has('sort'));  // true
+
+myUrl.searchParams.append('page', '2'); //  add new parameter
+console.log(myUrl.href); // https://example.com/products?category=shoes&sort=asc&page=2
+
+myUrl.searchParams.set('sort', 'desc'); // update 
+console.log(myUrl.href); // https://example.com/products?category=shoes&sort=desc&page=2
+
+myUrl.searchParams.delete('category');
+console.log(myUrl.href); // https://example.com/products?sort=desc&page=2
+
+// both gives full url
+console.log(myUrl.toString());
+console.log(myUrl.href);
+```
+
+- URL + Node.js HTTP Module (Important!):
+
+```js
+const http = require('http');
+const { URL } = require('url');
+
+http.createServer((req, res) => {
+    const myUrl = new URL(req.url, `http://${req.headers.host}`);
+
+    console.log(myUrl.pathname);
+    console.log(myUrl.searchParams.get('id'));
+
+    res.end('ok');
+}).listen(3000);
+
+// Example request: http://localhost:3000/products?id=5
+/*
+/products
+5
+*/
+```
+
+- Build dynamic URL:
+
+```js
+const { URL } = require('url');
+
+const apiUrl = new URL('https://api.example.com/search');
+
+apiUrl.searchParams.append('q', 'node js tutorial');
+apiUrl.searchParams.append('page', '1');
+apiUrl.searchParams.append('limit', '10');
+
+console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
+```
+#### path module:
+The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
+
+Key Methods: 
+
+- path.join: Joins multiple path together:
+
+```js
+const path = require('path');
+
+const fullPath = path.join('/users', 'john', 'documents', 'file.txt');
+console.log(fullPath);
+// '/users/john/documents/file.txt' on linux and macOS
+// '\users\john\documents\file.txt' on Windows
+```
+
+- path.resolve(): Returns the absolute path starting from root (/):
+
+```js
+const path = require('path');
+
+const result = path.resolve('folder', 'file.txt');
+console.log(result); // /home/muhammad-tamim/programming/notes/node-notes/folder/file.txt
+```
+
+- path.basename() - Returns the last portion of a path, means the file name:
+
+```js
+const path = require('path');
+
+console.log(path.basename('/users/john/file.txt')); // 'file.txt'
+console.log(path.basename('/users/john/file.txt', '.txt')); // 'file'
+```
+
+- path.dirname() - Get Parent Folder:
+
+```js
+const path = require('path');
+
+console.log(path.dirname('/folder/folder-2/file.txt')); // /folder/folder-2
+```
+
+- path.extname() - Returns the file extension:
+
+```js
+console.log(path.extname('file.txt')); // '.txt'
+console.log(path.extname('archive.tar.gz')); // '.gz'
+```
+
+- path.parse() - Break Path into objects
+
+```js
+const path = require('path');
+
+console.log(path.parse('/folder/folder-2/file.txt'));
+
+/*
+{
+  root: '/',
+  dir: '/folder/folder-2',
+  base: 'file.txt',
+  ext: '.txt',
+  name: 'file'
+}
+*/
+```
+
+- path.format() - Creates a path string from an object (opposite of parse):
+
+```js
+const path = require('path');
+
+const pathObj = {
+    dir: '/users/john',
+    base: 'file.txt'
+};
+console.log(path.format(pathObj)); // '/users/john/file.txt'
+```
+
+Note:__dirname and __filename are special Node variables and they don't depend fs module
+
+```js
+console.log(__dirname);  // directory name of current file
+console.log(__filename); // full path including file name
+
+/*
+/home/muhammad-tamim/programming/notes/node-notes
+/home/muhammad-tamim/programming/notes/node-notes/index.js
+*/
+```
+
+Example: 
+
+```js
+const path = require('path');
+
+// Get current file's directory
+const currentDir = __dirname;
+
+// Build path to a config file
+const configPath = path.join(currentDir, 'config', 'settings.json');
+
+// Extract information
+console.log('Full path:', configPath);
+console.log('Directory:', path.dirname(configPath));
+console.log('Filename:', path.basename(configPath));
+console.log('Extension:', path.extname(configPath));
+
+// Normalize messy paths
+const messyPath = '/users//john/../jane/./documents/file.txt';
+console.log(path.normalize(messyPath)); 
+// '/users/jane/documents/file.txt'
+```
 #### fs module:
 The fs module allows you to manage files and folders directly from your Node.js server.
 
@@ -722,119 +920,6 @@ here,
 - Automatically send each chunk to the write stream
 - Automatically handle backpressure
 - Automatically close the write stream when reading is done
-#### path module:
-The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
-
-Key Methods: 
-
-- path.join: Joins multiple path together:
-
-```js
-const path = require('path');
-
-const fullPath = path.join('/users', 'john', 'documents', 'file.txt');
-console.log(fullPath);
-// '/users/john/documents/file.txt' on linux and macOS
-// '\users\john\documents\file.txt' on Windows
-```
-
-- path.resolve(): Returns the absolute path starting from root (/):
-
-```js
-const path = require('path');
-
-const result = path.resolve('folder', 'file.txt');
-console.log(result); // /home/muhammad-tamim/programming/notes/node-notes/folder/file.txt
-```
-
-- path.basename() - Returns the last portion of a path, means the file name:
-
-```js
-const path = require('path');
-
-console.log(path.basename('/users/john/file.txt')); // 'file.txt'
-console.log(path.basename('/users/john/file.txt', '.txt')); // 'file'
-```
-
-- path.dirname() - Get Parent Folder:
-
-```js
-const path = require('path');
-
-console.log(path.dirname('/folder/folder-2/file.txt')); // /folder/folder-2
-```
-
-- path.extname() - Returns the file extension:
-
-```js
-console.log(path.extname('file.txt')); // '.txt'
-console.log(path.extname('archive.tar.gz')); // '.gz'
-```
-
-- path.parse() - Break Path into objects
-
-```js
-const path = require('path');
-
-console.log(path.parse('/folder/folder-2/file.txt'));
-
-/*
-{
-  root: '/',
-  dir: '/folder/folder-2',
-  base: 'file.txt',
-  ext: '.txt',
-  name: 'file'
-}
-*/
-```
-
-- path.format() - Creates a path string from an object (opposite of parse):
-
-```js
-const path = require('path');
-
-const pathObj = {
-    dir: '/users/john',
-    base: 'file.txt'
-};
-console.log(path.format(pathObj)); // '/users/john/file.txt'
-```
-
-Note:__dirname and __filename are special Node variables and they don't depend fs module
-
-```js
-console.log(__dirname);  // directory name of current file
-console.log(__filename); // full path including file name
-
-/*
-/home/muhammad-tamim/programming/notes/node-notes
-/home/muhammad-tamim/programming/notes/node-notes/index.js
-*/
-```
-
-Example: 
-
-```js
-const path = require('path');
-
-// Get current file's directory
-const currentDir = __dirname;
-
-// Build path to a config file
-const configPath = path.join(currentDir, 'config', 'settings.json');
-
-// Extract information
-console.log('Full path:', configPath);
-console.log('Directory:', path.dirname(configPath));
-console.log('Filename:', path.basename(configPath));
-console.log('Extension:', path.extname(configPath));
-
-// Normalize messy paths
-const messyPath = '/users//john/../jane/./documents/file.txt';
-console.log(path.normalize(messyPath)); 
-// '/users/jane/documents/file.txt'
-```
 #### OS Module: 
 The os module provides operating system-related utility methods and properties. It's useful for getting information about the system your Node.js application is running on.The module gives you information about (CPU, Memory, User, Network, Platform, System uptime etc)
 
@@ -1146,91 +1231,6 @@ function realTimeSystemMonitor() {
 }
 
 realTimeSystemMonitor(); 
-```
-#### URL Module:
-The url module helps you parse URLs, build URLs, and work with query strings
-
-```js
-const { URL } = require('url');
-
-const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
-console.log(myUrl);
-
-/*
-URL {
-  href: 'https://example.com/products?category=shoes&sort=asc',
-  origin: 'https://example.com',
-  protocol: 'https:',
-  username: '',
-  password: '',
-  host: 'example.com',
-  hostname: 'example.com',
-  port: '',
-  pathname: '/products',
-  search: '?category=shoes&sort=asc',
-  searchParams: URLSearchParams { 'category' => 'shoes', 'sort' => 'asc' },
-  hash: ''
-}
-*/
-```
-- Work wit query parameters: 
-
-```js
-const { URL } = require('url');
-
-const myUrl = new URL('https://example.com/products?category=shoes&sort=asc');
-
-console.log(myUrl.searchParams.get('category'));  // shoes
-console.log(myUrl.searchParams.has('sort'));  // true
-
-myUrl.searchParams.append('page', '2'); //  add new parameter
-console.log(myUrl.href); // https://example.com/products?category=shoes&sort=asc&page=2
-
-myUrl.searchParams.set('sort', 'desc'); // update 
-console.log(myUrl.href); // https://example.com/products?category=shoes&sort=desc&page=2
-
-myUrl.searchParams.delete('category');
-console.log(myUrl.href); // https://example.com/products?sort=desc&page=2
-
-// both gives full url
-console.log(myUrl.toString());
-console.log(myUrl.href);
-```
-
-- URL + Node.js HTTP Module (Important!):
-
-```js
-const http = require('http');
-const { URL } = require('url');
-
-http.createServer((req, res) => {
-    const myUrl = new URL(req.url, `http://${req.headers.host}`);
-
-    console.log(myUrl.pathname);
-    console.log(myUrl.searchParams.get('id'));
-
-    res.end('ok');
-}).listen(3000);
-
-// Example request: http://localhost:3000/products?id=5
-/*
-/products
-5
-*/
-```
-
-- Build dynamic URL:
-
-```js
-const { URL } = require('url');
-
-const apiUrl = new URL('https://api.example.com/search');
-
-apiUrl.searchParams.append('q', 'node js tutorial');
-apiUrl.searchParams.append('page', '1');
-apiUrl.searchParams.append('limit', '10');
-
-console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
 ```
 #### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
