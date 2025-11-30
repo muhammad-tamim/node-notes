@@ -9,6 +9,7 @@
     - [How Web Works:](#how-web-works)
     - [Node Vs Express:](#node-vs-express)
     - [Common HTTP Status Codes:](#common-http-status-codes)
+    - [How to take input in node.js like C, C++:](#how-to-take-input-in-nodejs-like-c-c)
   - [Modules:](#modules)
     - [Types of Modules:](#types-of-modules)
     - [Types of Module Systems:](#types-of-module-systems)
@@ -216,6 +217,31 @@ Note:
 - 3xx → Redirect
 - 4xx → Client mistake
 - 5xx → Server mistake
+
+### How to take input in node.js like C, C++:
+
+```js
+const arg = process.argv;
+
+const name = arg[2]
+const age = arg[3]
+
+console.log(arg)
+console.log(name, age)
+
+/*
+process.arg[0] = node path
+process.arg[1] = file path
+process.arg[2] = first actual input value
+
+[
+  '/home/muhammad-tamim/.nvm/versions/node/v24.4.1/bin/node',
+  '/home/muhammad-tamim/programming/notes/node-notes/index.js',
+  'tamim',
+  '20'
+]
+*/
+```
 
 ## Modules:
 A module in Node.js is simply a reusable piece of code (a file or package) that you can import and use in other parts of your application.
@@ -1121,7 +1147,6 @@ function realTimeSystemMonitor() {
 
 realTimeSystemMonitor(); 
 ```
-
 #### URL Module:
 The url module helps you parse URLs, build URLs, and work with query strings
 
@@ -1207,7 +1232,6 @@ apiUrl.searchParams.append('limit', '10');
 
 console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
 ```
-
 #### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
 
