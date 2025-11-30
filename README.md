@@ -35,10 +35,11 @@
           - [Create a folder:](#create-a-folder)
           - [Delete a folder:](#delete-a-folder)
           - [Reading folder contents:](#reading-folder-contents)
-        - [Streams (manual copying):](#streams-manual-copying)
+        - [Streams:](#streams)
           - [Piping (automatic copying):](#piping-automatic-copying)
       - [OS Module:](#os-module)
       - [Crypto Module:](#crypto-module)
+  - [Raw Node.js Project:](#raw-nodejs-project)
 - [Part 2: Express.js:](#part-2-expressjs)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
@@ -81,6 +82,7 @@
 
 
 # Part 1: Node.js: 
+
 ## Introduction: 
 Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
 
@@ -502,8 +504,14 @@ const http = require('http');
 const { MongoClient } = require("mongodb");
 
 const port = 3000;
-const uri = "mongodb+srv://db-user:HSVPnZLwfnPGPjAB@cluster0.ec7ovco.mongodb.net/?appName=Cluster0";
-const client = new MongoClient(uri);
+const uri = "mongodb://localhost:27017";
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+});
 
 async function run() {
     await client.connect();
@@ -583,7 +591,6 @@ console.log(myUrl.href); // https://example.com/products?sort=desc&page=2
 console.log(myUrl.toString());
 console.log(myUrl.href);
 ```
-
 #### path module:
 The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
 
@@ -692,7 +699,6 @@ console.log('Directory:', path.dirname(configPath));
 console.log('Filename:', path.basename(configPath));
 console.log('Extension:', path.extname(configPath));
 ```
-
 #### fs module:
 The fs module allows you to manage files and folders directly from your Node.js server.
 
@@ -851,26 +857,65 @@ fs.readdir('myFolder', (err, files) => {
 ```
 
 
-##### Streams (manual copying): 
-Streams allow you to read or write data in small chunks instead of loading the entire file into memory at once. This makes it fast and memory-efficient for large files.
+##### Streams: 
+Streams let you read or write data piece by piece, instead of loading everything into memory at once. This is great for large files, network requests, or continuous data.
+
+| Type      | Description                       | Example                         |
+| --------- | --------------------------------- | ------------------------------- |
+| Readable  | Data can be read                  | `fs.createReadStream()`, `req`  |
+| Writable  | Data can be written               | `fs.createWriteStream()`, `res` |
+| Duplex    | Can read and write simultaneously | TCP sockets                     |
+| Transform | Can read, modify, then write data | `zlib.createGzip()`             |
 
 ```js
+// basic example of readable stream
 const fs = require('fs');
 
-// create  
-const writeStream = fs.createWriteStream('output.txt');
-writeStream.write('Writing using stream...');
-writeStream.end();
+const readStream = fs.createReadStream('input.txt', 'utf8');
 
-// read
-const readStream = fs.createReadStream('output.txt', 'utf8');
-readStream.on('data', (chunk) => {
-    console.log("Chunk received:", chunk);
+readStream.on('data', chunk => {
+    console.log('Received chunk:', chunk);
 });
+
+readStream.on('end', () => {
+    console.log('Finished reading file.');
+});
+
+readStream.on('error', err => {
+    console.error('Error reading file:', err);
+});
+
+```
+here, 
+- data → fired for each chunk
+- end → fired when file is fully read
+- error → handle errors
+
+
+```js
+// basic example of writable stream
+
+const fs = require('fs');
+
+const writeStream = fs.createWriteStream('output.txt');
+
+writeStream.write('Hello ');
+writeStream.write('World!\n');
+writeStream.end(); // closes the stream
+
+writeStream.on('finish', () => {
+    console.log('Finished writing file.');
+});
+
+writeStream.on('error', err => {
+    console.error('Error writing file:', err);
+});
+
 ```
 
+
 ###### Piping (automatic copying): 
-Piping connects a readable stream to a writable stream so data automatically flows from the source to the destination without manually handling chunks.
+Piping connects a readable stream to a writable stream to copy data automatically. so data automatically flows from the source to the destination without manually handling chunks.
 
 ```js
 const fs = require('fs');
@@ -883,7 +928,6 @@ const writeStream = fs.createWriteStream('output.txt');
 // Pipe the read stream INTO the write stream
 readStream.pipe(writeStream);
 ```
-
 #### OS Module: 
 The os module provides operating system-related utility methods and properties. It's useful for getting information about the system your Node.js application is running on.The module gives you information about (CPU, Memory, User, Network, Platform, System uptime etc)
 
@@ -1049,8 +1093,6 @@ const os = require('os');
 
 console.log(os.hostname()); // Inspiron-3421
 ```
-
-
 #### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
 
@@ -1151,6 +1193,254 @@ const crypto = require('crypto');
 
 console.log(crypto.randomUUID()); // 136dfef5-b9d7-4b88-943f-519487ecba33
 ```
+
+
+## Raw Node.js Project: 
+
+```js
+const http = require('http');
+const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
+const { URL } = require('url');
+
+const port = 3000;
+
+const uri = "mongodb://localhost:27017";
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+});
+
+async function run() {
+    await client.connect();
+    const userCollection = client.db("userdb").collection('users');
+
+
+    const app = http.createServer(async (req, res) => {
+
+        const parsedUrl = new URL(req.url, `http://${req.headers.host}`)
+        const pathname = parsedUrl.pathname
+
+
+        // create:
+        if (req.method === "POST" && pathname === "/users") {
+            let body = "";
+            req.on("data", chunk => body += chunk);
+            req.on("end", async () => {
+                try {
+                    const data = JSON.parse(body);
+                    const result = await userCollection.insertOne(data);
+                    res.writeHead(201, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ insertedId: result.insertedId, ...data }));
+                } catch (err) {
+                    res.writeHead(400, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ error: "Invalid JSON" }));
+                }
+            });
+            return;
+        }
+
+
+        // Read:
+        if (req.method === "GET" && pathname === "/users") {
+            try {
+                const result = await userCollection.find().toArray();
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(JSON.stringify(result));
+            }
+            catch (err) {
+                res.writeHead(404, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Not Found" }));
+            }
+            return
+        }
+
+        // read single data
+        if (req.method === "GET" && pathname.startsWith("/users/")) {
+            const id = pathname.split("/")[2];
+            try {
+                const result = await userCollection.findOne({ _id: new ObjectId(id) });
+                if (!result) {
+                    res.writeHead(404, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ error: "User not found" }));
+                    return;
+                }
+                res.writeHead(200, { "Content-Type": "application/json" });
+                res.end(JSON.stringify(result));
+            } catch (err) {
+                res.writeHead(400, { "Content-Type": "application/json" });
+                res.end(JSON.stringify({ error: "Invalid ID" }));
+            }
+            return;
+        }
+
+
+
+        // Update:
+        if (req.method === "PATCH" && pathname.startsWith("/users/")) {
+            const id = pathname.split("/")[2];
+            let body = "";
+            req.on("data", chunk => body += chunk);
+            req.on("end", async () => {
+                try {
+                    const data = JSON.parse(body);
+                    const result = await userCollection.updateOne(
+                        { _id: new ObjectId(id) },
+                        { $set: data }
+                    );
+                    if (result.matchedCount === 0) {
+                        res.writeHead(404, { "Content-Type": "application/json" });
+                        res.end(JSON.stringify({ error: "User not found" }));
+                        return;
+                    }
+                    res.writeHead(200, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ message: "User updated" }));
+                } catch (err) {
+                    res.writeHead(400, { "Content-Type": "application/json" });
+                    res.end(JSON.stringify({ error: "Invalid ID or JSON" }));
+                }
+            });
+            return;
+        }
+
+
+
+        // Delete:
+        if (req.method === "DELETE" && pathname.startsWith("/users/")) {
+            const id = pathname.split("/")[2]
+            try {
+                const result = await userCollection.deleteOne({ _id: new ObjectId(id) })
+                if (result.deletedCount === 0) {
+                    res.writeHead(404, { "content-type": "application/json" })
+                    res.end(JSON.stringify({ error: "User not found" }))
+                    return
+                }
+                res.writeHead(200, { "content-type": "application/json" })
+                res.end(JSON.stringify({ message: "User Deleted" }))
+            } catch (err) {
+                res.writeHead(400, { "content-type": "application/json" })
+                res.end(JSON.stringify({ error: "Invalid ID" }))
+            }
+            return
+        }
+
+        // Not Found
+        res.writeHead(404, { "content-type": "application/json" })
+        res.end(JSON.stringify({ error: "Route not found" }))
+    });
+
+
+    app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+    });
+}
+run().catch(console.dir);
+```
+
+Explanation: 
+
+```js
+const parsedUrl = new URL(req.url, `http://${req.headers.host}`)
+const pathname = parsedUrl.pathname
+
+// example url get request: http://localhost:3000/users/692c849cb0169439d71850c7
+console.log(req.url) // /users/692c849cb0169439d71850c7
+console.log(parsedUrl)
+/*
+URL {
+href: 'http://localhost:3000/users/692c849cb0169439d71850c7',
+origin: 'http://localhost:3000',
+protocol: 'http:',
+username: '',
+password: '',
+host: 'localhost:3000',
+hostname: 'localhost',
+port: '3000',
+pathname: '/users/692c849cb0169439d71850c7',
+search: '',
+searchParams: URLSearchParams {},
+hash: ''
+}
+*/
+console.log(pathname) // /users/692c849cb0169439d71850c7
+```
+here, 
+- `req.url` → gives the URL path and query string of the incoming request. 
+For example if a client requests: GET http://localhost:3000/users/123?sort=asc then req.url = /users/123?sort=asc
+
+- URL is the built in global class form the url module, its need a full url to make it object: 
+
+```js
+const { URL } = require('url');
+
+const myURL = new URL('http://localhost:3000/users/123?sort=asc');
+console.log(myURL)
+
+/*
+ URL {
+  href: 'http://localhost:3000/users/123?sort=asc',
+  origin: 'http://localhost:3000',
+  protocol: 'http:',
+  username: '',
+  password: '',
+  host: 'localhost:3000',
+  hostname: 'localhost',
+  port: '3000',
+  pathname: '/users/123',
+  search: '?sort=asc',
+  searchParams: URLSearchParams { 'sort' => 'asc' },
+  hash: ''
+}
+ */
+```
+
+but in our case we just have, req.url = /users/123?sort=asc, so thats why we used: 
+
+```js
+const parsedUrl = new URL(req.url, `http://${req.headers.host}`)
+// req.headers.host = localhost:3000
+```
+
+- `const pathname = parsedUrl.pathname`, juts give us /users/123 pathname, means its not have query parameters and others info. This allows us to match routes like /users or /users/:id easily without worrying about query parameters.
+
+---
+
+```js
+if (req.method === "POST" && pathname === "/users") {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+    req.on("end", async () => {
+        try {
+            const data = JSON.parse(body);
+            const result = await userCollection.insertOne(data);
+            res.writeHead(201, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ insertedId: result.insertedId, ...data }));
+        } catch (err) {
+            res.writeHead(400, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ error: "Invalid JSON" }));
+        }
+    });
+    return;
+}
+```
+We know earlier that req is a readable stream, so here:
+
+- `req.on("data", chunk => body += chunk);` 
+  - data is fired every time a chunk of data arrives.
+  - We append it to a variable because the request body may arrive in multiple pieces. This variable collects all the pieces.
+
+- `req.on("end", async () => { ... });`
+  - Fired when all chunks have been received.
+  - At this point, body has the full request body and we can parse it with JSON.parse
+
+in short: 
+- req.on("data") → get pieces of incoming data chunk by chunk
+- req.on("end") → all data received, now process it
+
+
+
 
 # Part 2: Express.js:
 
@@ -2686,14 +2976,14 @@ app.use(cors()) // use cors middleware
 app.use(express.json()) // use express middleware
 
 
-const uri = "mongodb+srv://db-user:HSVPnZLwfnPGPjAB@cluster0.ec7ovco.mongodb.net/?appName=Cluster0";
+const uri = "mongodb://localhost:27017";
 
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
         strict: true,
         deprecationErrors: true,
-    }
+    },
 });
 
 async function run() {
