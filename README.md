@@ -27,16 +27,16 @@
           - [Read files:](#read-files)
           - [Update files:](#update-files)
           - [Delete files:](#delete-files)
-        - [Renaming files:](#renaming-files)
-        - [Checking files:](#checking-files)
+          - [Renaming files:](#renaming-files)
+          - [Checking files existence:](#checking-files-existence)
           - [Copying files:](#copying-files)
           - [Watching Files:](#watching-files)
         - [Working with Folder (Directory):](#working-with-folder-directory)
           - [Create a folder:](#create-a-folder)
           - [Delete a folder:](#delete-a-folder)
           - [Reading folder contents:](#reading-folder-contents)
-        - [Streams:](#streams)
-          - [Piping:](#piping)
+        - [Streams (manual copying):](#streams-manual-copying)
+          - [Piping (automatic copying):](#piping-automatic-copying)
       - [OS Module:](#os-module)
       - [Crypto Module:](#crypto-module)
 - [Part 2: Express.js:](#part-2-expressjs)
@@ -584,41 +584,6 @@ console.log(myUrl.toString());
 console.log(myUrl.href);
 ```
 
-- URL + Node.js HTTP Module (Important!):
-
-```js
-const http = require('http');
-const { URL } = require('url');
-
-http.createServer((req, res) => {
-    const myUrl = new URL(req.url, `http://${req.headers.host}`);
-
-    console.log(myUrl.pathname);
-    console.log(myUrl.searchParams.get('id'));
-
-    res.end('ok');
-}).listen(3000);
-
-// Example request: http://localhost:3000/products?id=5
-/*
-/products
-5
-*/
-```
-
-- Build dynamic URL:
-
-```js
-const { URL } = require('url');
-
-const apiUrl = new URL('https://api.example.com/search');
-
-apiUrl.searchParams.append('q', 'node js tutorial');
-apiUrl.searchParams.append('page', '1');
-apiUrl.searchParams.append('limit', '10');
-
-console.log(apiUrl.href); // https://api.example.com/search?q=node+js+tutorial&page=1&limit=10
-```
 #### path module:
 The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
 
@@ -726,12 +691,8 @@ console.log('Full path:', configPath);
 console.log('Directory:', path.dirname(configPath));
 console.log('Filename:', path.basename(configPath));
 console.log('Extension:', path.extname(configPath));
-
-// Normalize messy paths
-const messyPath = '/users//john/../jane/./documents/file.txt';
-console.log(path.normalize(messyPath)); 
-// '/users/jane/documents/file.txt'
 ```
+
 #### fs module:
 The fs module allows you to manage files and folders directly from your Node.js server.
 
@@ -791,7 +752,7 @@ fs.unlink('data.txt', (err) => {
 });
 ```
 
-##### Renaming files:
+###### Renaming files:
 
 ```js
 const fs = require('fs');
@@ -802,7 +763,7 @@ fs.rename('old.txt', 'new.txt', (err) => {
 });
 ```
 
-##### Checking files:
+###### Checking files existence:
 
 ```js
 const fs = require('fs');
@@ -890,8 +851,8 @@ fs.readdir('myFolder', (err, files) => {
 ```
 
 
-##### Streams: 
-Streams let you read/write large files without loading the whole file into memory.
+##### Streams (manual copying): 
+Streams allow you to read or write data in small chunks instead of loading the entire file into memory at once. This makes it fast and memory-efficient for large files.
 
 ```js
 const fs = require('fs');
@@ -908,18 +869,21 @@ readStream.on('data', (chunk) => {
 });
 ```
 
-###### Piping: 
-Piping means connecting one stream to another stream so data flows automatically from source → destination.
+###### Piping (automatic copying): 
+Piping connects a readable stream to a writable stream so data automatically flows from the source to the destination without manually handling chunks.
 
 ```js
-fs.createReadStream('input.txt')
-  .pipe(fs.createWriteStream('output.txt'));
+const fs = require('fs');
+
+// Source file (input)
+const readStream = fs.createReadStream('input.txt', 'utf8');
+// Destination file (output)
+const writeStream = fs.createWriteStream('output.txt');
+
+// Pipe the read stream INTO the write stream
+readStream.pipe(writeStream);
 ```
-here, 
-- Read data chunk by chunk from input.txt
-- Automatically send each chunk to the write stream
-- Automatically handle backpressure
-- Automatically close the write stream when reading is done
+
 #### OS Module: 
 The os module provides operating system-related utility methods and properties. It's useful for getting information about the system your Node.js application is running on.The module gives you information about (CPU, Memory, User, Network, Platform, System uptime etc)
 
@@ -1027,15 +991,6 @@ console.log(`UID: ${os.userInfo().uid}`); // UID: 1000
 console.log(`GID: ${os.userInfo().gid}`); // GID: 1000
 ```
 
-- Directory Paths:
-
-```js
-const os = require('os');
-
-console.log(os.homedir()); // Output: '/home/username' (Linux), 'C:\Users\username' (Windows)
-console.log(os.tmpdir()); // Output: '/tmp' (Linux), 'C:\Users\username\AppData\Local\Temp' (Windows)
-```
-
 - Network Interfaces:
 
 ```js
@@ -1087,38 +1042,6 @@ console.log(os.networkInterfaces());
 */
 ```
 
-```js
-const os = require('os');
-
-function getIPv4Addresses() {
-    const interfaces = os.networkInterfaces();
-    const addresses = [];
-
-    for (let interfaceName in interfaces) {
-        for (let iface of interfaces[interfaceName]) {
-            if (iface.family === 'IPv4' && !iface.internal) {
-                addresses.push({
-                    interface: interfaceName,
-                    address: iface.address
-                });
-            }
-        }
-    }
-
-    return addresses;
-}
-
-console.log(getIPv4Addresses()); // [ { interface: 'wlp6s0', address: '192.168.43.147' } ]
-```
-
-- system Constants:
-
-```js
-const os = require('os');
-
-console.log(JSON.stringify(os.EOL)); // Linux/macOS → \n, Windows → \r\n
-```
-
 - Hostname:
 
 ```js
@@ -1127,111 +1050,7 @@ const os = require('os');
 console.log(os.hostname()); // Inspiron-3421
 ```
 
-Examples:
 
-```js
-const os = require('os');
-
-function displaySystemInfo() {
-    console.log('=== SYSTEM INFORMATION ===\n');
-
-    // OS Info
-    console.log('Operating System:', os.type(), os.release());
-    console.log('Platform:', os.platform());
-    console.log('Architecture:', os.arch());
-    console.log('Hostname:', os.hostname());
-    console.log('Uptime:', (os.uptime() / 3600).toFixed(2), 'hours\n');
-
-    // CPU Info
-    const cpus = os.cpus();
-    console.log(`CPU: ${cpus[0].model}`);
-    console.log(`Cores: ${cpus.length}`);
-    console.log(`Speed: ${cpus[0].speed} MHz\n`);
-
-    // Memory Info
-    const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
-    const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
-    const usedMem = (totalMem - freeMem).toFixed(2);
-    console.log(`Memory: ${usedMem} GB / ${totalMem} GB used`);
-    console.log(`Free Memory: ${freeMem} GB\n`);
-
-    // User Info
-    const user = os.userInfo();
-    console.log('User:', user.username);
-    console.log('Home:', user.homedir);
-}
-
-displaySystemInfo();
-```
-
-```js
-const os = require('os');
-
-function checkSystemRequirements() {
-    const requirements = {
-        minMemoryGB: 4,
-        minCPUs: 2,
-        supportedPlatforms: ['linux', 'darwin', 'win32']
-    };
-
-    const totalMemoryGB = os.totalmem() / 1024 / 1024 / 1024;
-    const cpuCount = os.cpus().length;
-    const platform = os.platform();
-
-    console.log('Checking system requirements...\n');
-
-    if (totalMemoryGB < requirements.minMemoryGB) {
-        console.log(`❌ Insufficient memory: ${totalMemoryGB.toFixed(2)} GB (need ${requirements.minMemoryGB} GB)`);
-        return false;
-    } else {
-        console.log(`✅ Memory: ${totalMemoryGB.toFixed(2)} GB`);
-    }
-
-    if (cpuCount < requirements.minCPUs) {
-        console.log(`❌ Insufficient CPUs: ${cpuCount} (need ${requirements.minCPUs})`);
-        return false;
-    } else {
-        console.log(`✅ CPUs: ${cpuCount}`);
-    }
-
-    if (!requirements.supportedPlatforms.includes(platform)) {
-        console.log(`❌ Unsupported platform: ${platform}`);
-        return false;
-    } else {
-        console.log(`✅ Platform: ${platform}`);
-    }
-
-    console.log('\n✅ All requirements met!');
-    return true;
-}
-
-checkSystemRequirements();
-```
-
-```js
-const os = require('os');
-
-function realTimeSystemMonitor() {
-    setInterval(() => {
-        const freeMem = (os.freemem() / 1024 / 1024 / 1024).toFixed(2);
-        const totalMem = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
-        const uptime = (os.uptime() / 3600).toFixed(2);
-
-        console.clear();
-        console.log('=== SYSTEM MONITOR ===');
-        console.log(`Time: ${new Date().toLocaleTimeString()}`);
-        console.log(`Free Memory: ${freeMem} GB / ${totalMem} GB`);
-        console.log(`Uptime: ${uptime} hours`);
-
-        const loadAvg = os.loadavg();
-        if (loadAvg) {
-            console.log(`Load Average: ${loadAvg.map(l => l.toFixed(2)).join(', ')}`);
-        }
-    }, 2000);
-}
-
-realTimeSystemMonitor(); 
-```
 #### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
 
