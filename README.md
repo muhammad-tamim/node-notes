@@ -1732,7 +1732,7 @@ app.listen(port, () => {
 
 
 # Part 3: MongoDB:
-MongoDB is a NoSQL database that stores data in flexibly in JSON(Actually BSON = Binary JSON) documents format. Unlike traditional SQL databases with tables and rows, MongoDB uses collections and documents.
+MongoDB is a NoSQL document database that stores data flexibly in JSON(Actually BSON = Binary JSON) format. Unlike traditional SQL relational databases with tables and rows, MongoDB uses collections and documents.
 
 Note: BSON is a binary-based representation of JSON. MongoDB uses this format for faster data operations, support for more data types, and efficient storage.
 
