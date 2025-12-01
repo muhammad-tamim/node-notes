@@ -50,37 +50,37 @@
   - [Router:](#router)
   - [Route chaining:](#route-chaining)
   - [Serving static files:](#serving-static-files)
-- [Part 3: MongoDb:](#part-3-mongodb)
+- [Part 3: MongoDB:](#part-3-mongodb)
+  - [How a api code works:](#how-a-api-code-works)
+  - [What is CRUD Operation:](#what-is-crud-operation)
+  - [Create(POST)](#createpost)
+    - [insertOne():](#insertone)
+    - [insertMany():](#insertmany)
+  - [Read(GET)](#readget)
+    - [find():](#find)
+      - [cursor:](#cursor)
+    - [findOne():](#findone)
+    - [countDocuments():](#countdocuments)
+    - [distinct():](#distinct)
+    - [aggregate() and Pipeline:](#aggregate-and-pipeline)
+      - [Common Aggregation Stages:](#common-aggregation-stages)
+  - [Update( PATCH/PUT )](#update-patchput-)
+    - [PATCH (partial update - recommended):](#patch-partial-update---recommended)
+      - [updateOne():](#updateone)
+      - [updateMany():](#updatemany)
+      - [Patch Operators:](#patch-operators)
+    - [PUT (Full Replace):](#put-full-replace)
+      - [replaceOne():](#replaceone)
+      - [findOneAndReplace():](#findoneandreplace)
+  - [Delete(DELETE)](#deletedelete)
+    - [deleteOne():](#deleteone)
+    - [deleteMany():](#deletemany)
+    - [findOneAndDelete():](#findoneanddelete)
+  - [bulkWrite():](#bulkwrite)
+  - [Difference Between req.body, req.params and req.query:](#difference-between-reqbody-reqparams-and-reqquery)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
   - [Introduction:](#introduction-1)
     - [setup:](#setup-1)
-    - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
-  - [CRUD Operation:](#crud-operation)
-    - [Create(POST)](#createpost)
-      - [insertOne():](#insertone)
-      - [insertMany():](#insertmany)
-    - [Read(GET)](#readget)
-      - [find():](#find)
-        - [cursor:](#cursor)
-      - [findOne():](#findone)
-      - [countDocuments():](#countdocuments)
-      - [distinct():](#distinct)
-      - [aggregate() and Pipeline:](#aggregate-and-pipeline)
-        - [Common Aggregation Stages:](#common-aggregation-stages)
-    - [Update( PATCH/PUT )](#update-patchput-)
-      - [PATCH (partial update - recommended):](#patch-partial-update---recommended)
-        - [updateOne():](#updateone)
-        - [updateMany():](#updatemany)
-        - [Patch Operators:](#patch-operators)
-      - [PUT (Full Replace):](#put-full-replace)
-        - [replaceOne():](#replaceone)
-        - [findOneAndReplace():](#findoneandreplace)
-    - [Delete(DELETE)](#deletedelete)
-      - [deleteOne():](#deleteone)
-      - [deleteMany():](#deletemany)
-      - [findOneAndDelete():](#findoneanddelete)
-    - [bulkWrite():](#bulkwrite)
-    - [Difference Between req.body, req.params and req.query:](#difference-between-reqbody-reqparams-and-reqquery)
     - [Examples:](#examples)
       - [Example 1:](#example-1)
       - [Example 2:](#example-2)
@@ -1732,110 +1732,24 @@ app.listen(port, () => {
 ```
 
 
-# Part 3: MongoDb:
+# Part 3: MongoDB:
+MongoDB is a NoSQL database that stores data in flexibly in JSON(Actually BSON = Binary JSON) documents format. Unlike traditional SQL databases with tables and rows, MongoDB uses collections and documents.
 
-# Part 4: Node.js + Express.js + MongoDB:
-## Introduction:
-### setup:
+Note: BSON is a binary-based representation of JSON. MongoDB uses this format for faster data operations, support for more data types, and efficient storage.
 
-**step 1:** 
+Note: In the context of MongoDB, a document is basically a single record in a collection, similar to a row in a SQL database.
 
-```bash
-npm init -y
 ```
-**step 2:** 
+SQL                      MongoDB
+------------------       -------------------
+Database                 Database
+  └── Table                └── Collection
+        └── Row                  └── Document
+              └── Column               └── Field
 
-```bash
-npm i express mongodb nodemon cors dotenv
-```
-
-Note: 
-- nodemon automatically restarts the server whenever we make code changes.
-- cors allows cross-origin requests, useful when frontend and backend run on different ports or domains.
-- dotenv lets us store sensitive data (like MongoDB URI or passwords) in a .env file and access them using process.env, keeping our project secure and preventing secrets from going to GitHub.
-
-**step 3:** 
-
-```js
-const express = require('express')
-const cors = require('cors')
-require('dotenv').config()
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-
-const port = process.env.PORT || 3000
-
-const app = express()
-app.use(cors()) // use cors middleware
-app.use(express.json()) // use express middleware
-
-
-const client = new MongoClient(process.env.MONGODB_URI, {
-    serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-    }
-});
-
-async function run() {
-    await client.connect();
-
-    // const database = client.db("userdb")
-    // const usersCollection = database.collection('users')
-    const usersCollection = client.db("userdb").collection('users')
-
-
-    /*
-    
-    ALl CRUD Operation here  
-    
-    */
-
-    // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
-}
-run().catch(console.dir);
-
-
-app.get('/', (req, res) => {
-    res.send('Hello World!')
-})
-
-app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
-```
-Note: Middleware in Express is a function that runs between the request and the response. It can modify the request, check something, or run some logic before sending the final response.
-
-**step 4:** 
-
-`"start": "node index.js"`: Many deployment platforms (like Render, Vercel, Railway, Heroku) automatically look for this script and They use this command to run your server., if we don't include it, deployment will fail because the platform doesn't know hot to start your app.
-
-```js
-{
-  "name": "server",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "mongodb": "^7.0.0",
-    "nodemon": "^3.1.11"
-  }
-}
 ```
 
-### How a api code works in node+express+mongodb:
+## How a api code works:
 
 ```js
 app.post('/users', async (req, res) => {
@@ -1883,7 +1797,8 @@ fetch('api')
 But in mongodb methods are already return js object when their promises resolve. So inside express we don't need to use res.json(), we can directly send the object using res.send().
 
 
-## CRUD Operation:
+
+## What is CRUD Operation:
 
 | Operation  | HTTP Method   | Meaning          |
 | ---------- | ------------- | ---------------- |
@@ -1895,22 +1810,10 @@ But in mongodb methods are already return js object when their promises resolve.
 - PUT = Replaces the entire document with the new data.
 - PATCH = Updates only specific fields without touching others field of the document.
 
-Note: In the context of MongoDB, a document is basically a single record in a collection, similar to a row in a SQL database.
 
+## Create(POST)
 
-```
-SQL                      MongoDB
-------------------       -------------------
-Database                 Database
-  └── Table                └── Collection
-        └── Row                  └── Document
-              └── Column               └── Field
-
-```
-
-
-### Create(POST)
-#### insertOne():
+### insertOne():
 Insert a single document
 
 ```js
@@ -1937,7 +1840,7 @@ app.post('/users', async (req, res) => {
 });
 ```
 
-#### insertMany():
+### insertMany():
 Insert multiple documents
 
 ```js
@@ -1948,9 +1851,9 @@ app.post('/users/bulk', async (req, res) => {
 });
 ```
 
-### Read(GET)
+## Read(GET)
 
-#### find(): 
+### find(): 
 Get all data:
 
 ```js
@@ -1962,7 +1865,7 @@ app.get('/users', async (req, res) => {
 
 note: find() returns a **cursor**, so you need to use .toArray() methods to convert the cursor to array. 
 
-##### cursor:
+#### cursor:
 A cursor is an object that MongoDB returns when you run a query like find(). It does not immediately give all the data — instead, it gives a pointer to the result set. Because MongoDB may return thousands or millions of documents, so returning all at once could:
 - use too much RAM
 - slow your server
@@ -2069,7 +1972,7 @@ app.get('/users/names', async (req, res) => {
 });
 ```
 
-#### findOne():
+### findOne():
 Get a single item by ID:
 
 ```js
@@ -2081,7 +1984,7 @@ app.get('/users/:id', async (req, res) => {
 });
 ```
 
-#### countDocuments():
+### countDocuments():
 returns a number after Counting matching documents
 
 ```js
@@ -2092,7 +1995,7 @@ app.get('/users', async (req, res) => {
 });
 ```
 
-#### distinct():
+### distinct():
 Returns an array of unique values of a specific field/key:
 
 ```js
@@ -2103,7 +2006,7 @@ app.get('/users/roles', async (req, res) => {
 });
 ```
 
-#### aggregate() and Pipeline:
+### aggregate() and Pipeline:
 - aggregate() is a method used to process data through a pipeline. Its returns a cursor.
 - A pipeline is an array of stages. Each step in the pipeline is called a stage. Each stage processes the documents and passes them to the next stage.
 
@@ -2116,8 +2019,6 @@ db.collection.aggregate([
   ...
 ])
 ```
-  
-
 
 
 
@@ -2157,7 +2058,7 @@ $cond, $ifNull, $eq, $ne, $gt, $gte, $lt, $lte, $and, $or, $not, $switch
 $toInt, $toDouble, $toString, $type, $convert, $round, $trunc, $floor, $ceil
 ```
 
-##### Common Aggregation Stages:
+#### Common Aggregation Stages:
 
 - $match - Filters documents  
 
@@ -2624,11 +2525,11 @@ Output:
 ]
 ```
 
-### Update( PATCH/PUT )
+## Update( PATCH/PUT )
 
-#### PATCH (partial update - recommended):
+### PATCH (partial update - recommended):
 
-##### updateOne():
+#### updateOne():
 
 ```js
 app.patch('/users/:id', async (req, res) => {
@@ -2644,7 +2545,7 @@ app.patch('/users/:id', async (req, res) => {
 });
 ```
 
-##### updateMany():
+#### updateMany():
 
 ```js
 app.patch('/users/update-city', async (req, res) => {
@@ -2659,7 +2560,7 @@ app.patch('/users/update-city', async (req, res) => {
 });
 ```
 
-##### Patch Operators:
+#### Patch Operators:
 
 - $inc: Use when you want to increase or decrease a number on the document field:
 
@@ -2741,9 +2642,9 @@ app.patch('/users/:email', async (req, res) => {
 });
 ```
 
-#### PUT (Full Replace):
+### PUT (Full Replace):
 
-##### replaceOne(): 
+#### replaceOne(): 
 
 Removed missing fields
 
@@ -2760,7 +2661,7 @@ app.put('/users/:id', async (req, res) => {
     res.send(result);
 });
 ```
-##### findOneAndReplace():
+#### findOneAndReplace():
 Replace a document and return it
 
 ```js
@@ -2778,9 +2679,9 @@ app.put('/users/replace/:id', async (req, res) => {
 });
 ```
 
-### Delete(DELETE)
+## Delete(DELETE)
 
-#### deleteOne():
+### deleteOne():
 delete a specific document.
 
 ```js
@@ -2793,7 +2694,7 @@ app.delete('/users/:id', async (req, res) => {
 });
 ```
 
-#### deleteMany():
+### deleteMany():
 delete multiple items.
 
 ```js
@@ -2804,7 +2705,7 @@ app.delete('/users', async (req, res) => {
 });
 ```
 
-#### findOneAndDelete():
+### findOneAndDelete():
 Delete a single document that matches a filter and return the deleted document.
 
 ```js
@@ -2819,7 +2720,7 @@ app.delete('/users/:email', async (req, res) => {
 });
 ```
 
-### bulkWrite():
+## bulkWrite():
 bulkWrite() allows you to perform multiple write operations (insert/update/delete) operations at once:
 
 ```js
@@ -2847,7 +2748,7 @@ app.post('/users/bulk-update', async (req, res) => {
 });
 ```
 
-### Difference Between req.body, req.params and req.query:
+## Difference Between req.body, req.params and req.query:
 
 - req.body → used when we need requested body info:
 
@@ -2902,6 +2803,110 @@ app.get('/users', async (req, res) => {
     res.send(result);
 });
 ```
+
+
+# Part 4: Node.js + Express.js + MongoDB:
+## Introduction:
+### setup:
+
+**step 1:** 
+
+```bash
+npm init -y
+```
+**step 2:** 
+
+```bash
+npm i express mongodb nodemon cors dotenv
+```
+
+Note: 
+- nodemon automatically restarts the server whenever we make code changes.
+- cors allows cross-origin requests, useful when frontend and backend run on different ports or domains.
+- dotenv lets us store sensitive data (like MongoDB URI or passwords) in a .env file and access them using process.env, keeping our project secure and preventing secrets from going to GitHub.
+
+**step 3:** 
+
+```js
+const express = require('express')
+const cors = require('cors')
+require('dotenv').config()
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+
+const port = process.env.PORT || 3000
+
+const app = express()
+app.use(cors()) // use cors middleware
+app.use(express.json()) // use express middleware
+
+
+const client = new MongoClient(process.env.MONGODB_URI, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    }
+});
+
+async function run() {
+    await client.connect();
+
+    // const database = client.db("userdb")
+    // const usersCollection = database.collection('users')
+    const usersCollection = client.db("userdb").collection('users')
+
+
+    /*
+    
+    ALl CRUD Operation here  
+    
+    */
+
+    // Send a ping to confirm a successful connection
+    await client.db("admin").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+}
+run().catch(console.dir);
+
+
+app.get('/', (req, res) => {
+    res.send('Hello World!')
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+```
+Note: Middleware in Express is a function that runs between the request and the response. It can modify the request, check something, or run some logic before sending the final response.
+
+**step 4:** 
+
+`"start": "node index.js"`: Many deployment platforms (like Render, Vercel, Railway, Heroku) automatically look for this script and They use this command to run your server., if we don't include it, deployment will fail because the platform doesn't know hot to start your app.
+
+```js
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mongodb": "^7.0.0",
+    "nodemon": "^3.1.11"
+  }
+}
+```
+
+
 
 
 ### Examples:
