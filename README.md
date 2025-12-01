@@ -41,10 +41,19 @@
       - [Crypto Module:](#crypto-module)
   - [Raw Node.js Project:](#raw-nodejs-project)
 - [Part 2: Express.js:](#part-2-expressjs)
+  - [Setup:](#setup)
+  - [Routing:](#routing)
+    - [Route parameters:](#route-parameters)
+    - [Query Parameters:](#query-parameters)
+  - [Middleware:](#middleware)
+  - [Sending Response:](#sending-response)
+  - [Router:](#router)
+  - [Route chaining:](#route-chaining)
+  - [Serving static files:](#serving-static-files)
 - [Part 3: MongoDb:](#part-3-mongodb)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
   - [Introduction:](#introduction-1)
-    - [setup:](#setup)
+    - [setup:](#setup-1)
     - [How a api code works in node+express+mongodb:](#how-a-api-code-works-in-nodeexpressmongodb)
   - [CRUD Operation:](#crud-operation)
     - [Create(POST)](#createpost)
@@ -1443,6 +1452,285 @@ in short:
 
 
 # Part 2: Express.js:
+Express.js is a minimal, flexible and fast web framework for Node.js. It makes building APIs and web servers much easier than using the raw http module.
+
+## Setup: 
+```js
+npm init -y
+npm install express
+```
+
+```js
+const express = require("express");
+const app = express();
+const port = 3000;
+
+// Home route
+app.get("/", (req, res) => {
+  res.send("Hello Express!");
+});
+
+// Start server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+```
+
+## Routing:
+
+```js
+// GET request
+app.get('/users', (req, res) => {
+    res.send('Get all users');
+});
+
+// POST request
+app.post('/users', (req, res) => {
+    res.send('Create a new user');
+});
+
+// PUT request
+app.put('/users/:id', (req, res) => {
+    res.send(`Update user ${req.params.id}`);
+});
+
+// DELETE request
+app.delete('/users/:id', (req, res) => {
+    res.send(`Delete user ${req.params.id}`);
+});
+```
+
+### Route parameters:
+Access dynamic values form the url:
+
+```js
+app.get('/users/:id', (req, res) => {
+    const userId = req.params.id;
+    res.send(`User ID: ${userId}`);
+});
+
+// Multiple parameters
+app.get('/posts/:year/:month', (req, res) => {
+    res.json({
+        year: req.params.year,
+        month: req.params.month
+    });
+});
+```
+
+### Query Parameters: 
+Access query strings from the URL:
+
+```js
+// URL: /search?term=express&limit=10
+app.get('/search', (req, res) => {
+    const term = req.query.term;
+    const limit = req.query.limit;
+    res.json({ term, limit });
+});
+```
+
+## Middleware: 
+
+Middleware = A functions that run before your route handler. it have access to the request and response objects and can modify them or end the request-response cycle.
+
+```js
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// Built-in middleware for parsing JSON
+app.use(express.json());
+
+
+// application lavel middleware
+app.use((req, res, next) => {
+    console.log(`form custom middleware: ${req.method} ${req.url}`);
+    next(); // Pass control to the next middleware
+});
+
+// route specific Middleware 
+const authenticate = (req, res, next) => {
+    const token = req.headers.authorization;
+    if (token === 'secret-token') {
+        next();
+    } else {
+        res.status(401).send('Unauthorized');
+    }
+};
+
+
+app.get('/protected', authenticate, (req, res) => {
+    res.send('This is protected content');
+});
+
+// Route that triggers an error
+app.get('/error', (req, res, next) => {
+    const err = new Error('Something went wrong!');
+    next(err); // Pass error to error-handling middleware
+});
+
+// wildcard middleware (for unmatched routes)
+app.use((req, res) => {
+  res.status(404).send('Page not found');
+});
+
+// error handling middleware
+// Use it to catch errors thrown in routes or middleware.
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ 
+    message: 'Something went wrong!',
+    error: err.message 
+  });
+});
+
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+});
+```
+
+Note: When the client sends this:
+
+```js
+{
+  "name": "Tamim",
+  "age": 20
+}
+```
+
+You can access it in Express like:
+
+```js
+req.body.name
+req.body.age
+```
+Without express.json(), req.body will always be undefined.
+
+## Sending Response: 
+Express provides several ways to send responses:
+
+```js
+  res.send('Plain text response');
+  
+  // Send JSON
+  res.json({ message: 'JSON response' });
+  
+  // Send with status code
+  res.status(404).send('Not found');
+  
+  // Redirect
+  res.redirect('/another-page');
+  
+  // Send file
+  res.sendFile(__dirname + '/index.html');
+```
+
+## Router:
+Organize routes using Express Router:
+
+routes/users.js:
+```js
+const express = require('express');
+const router = express.Router(); 
+
+// GET /api/users
+router.get('/', (req, res) => {
+  res.send('Get all users');
+});
+
+// GET /api/users/:id
+router.get('/:id', (req, res) => {
+  res.send(`Get user ${req.params.id}`);
+});
+
+module.exports = router;
+```
+
+index.js: 
+```js
+const express = require('express');
+const app = express();
+const PORT = 3000;
+
+// import the router
+const userRoutes = require('./routes/users');
+
+// mount the router with a prefix
+app.use('/api/users', userRoutes);
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
+```
+
+## Route chaining: 
+
+```js
+// Route chaining for /users
+app.route('/users')
+  .get((req, res) => {
+    // GET /users - fetch all users
+    res.send('Get all users');
+  })
+  .post((req, res) => {
+    // POST /users - create a new user
+    const newUser = req.body;
+    res.send(`User created: ${JSON.stringify(newUser)}`);
+  })
+  .put((req, res) => {
+    // PUT /users - update all users (just an example)
+    res.send('Update all users');
+  });
+
+// Route chaining for /users/:id
+app.route('/users/:id')
+  .get((req, res) => {
+    res.send(`Get user with ID ${req.params.id}`);
+  })
+  .put((req, res) => {
+    res.send(`Update user with ID ${req.params.id}`);
+  })
+  .delete((req, res) => {
+    res.send(`Delete user with ID ${req.params.id}`);
+  });
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+```
+
+## Serving static files: 
+
+Express provides a built-in middleware called express.static to serve static files like (html, css, js, images etc).
+
+```js
+public/
+    ├── index.html
+    └── images/
+        └── logo.png
+
+http://localhost:3000/index.html
+http://localhost:3000/images/logo.png
+```
+
+```js
+const express = require('express');
+const path = require('path');
+
+const app = express();
+const port = 3000;
+
+// Serve static files from "public" folder
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+});
+```
+
 
 # Part 3: MongoDb:
 
