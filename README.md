@@ -79,15 +79,14 @@
   - [bulkWrite():](#bulkwrite)
   - [Difference Between req.body, req.params and req.query:](#difference-between-reqbody-reqparams-and-reqquery)
 - [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
-  - [Introduction:](#introduction-1)
-    - [setup:](#setup-1)
-    - [Examples:](#examples)
-      - [Example 1:](#example-1)
-      - [Example 2:](#example-2)
-    - [Others:](#others)
-      - [Different way to  Accessing form data:](#different-way-to--accessing-form-data)
-        - [Manual accessing:](#manual-accessing)
-        - [Using formData():](#using-formdata)
+  - [setup:](#setup-1)
+  - [Examples:](#examples)
+    - [Example 1:](#example-1)
+    - [Example 2:](#example-2)
+  - [Others:](#others)
+    - [Different way to  Accessing form data:](#different-way-to--accessing-form-data)
+      - [Manual accessing:](#manual-accessing)
+      - [Using formData():](#using-formdata)
 
 
 # Part 1: Node.js: 
@@ -2806,8 +2805,8 @@ app.get('/users', async (req, res) => {
 
 
 # Part 4: Node.js + Express.js + MongoDB:
-## Introduction:
-### setup:
+
+## setup:
 
 **step 1:** 
 
@@ -2909,9 +2908,9 @@ Note: Middleware in Express is a function that runs between the request and the 
 
 
 
-### Examples:
+## Examples:
 
-#### Example 1:
+### Example 1:
 
 Backend:
 
@@ -3253,7 +3252,7 @@ export default App;
 
 ![image](./images/crud-operation.png)
 
-#### Example 2:
+### Example 2:
 
 Backend:
 
@@ -3563,10 +3562,10 @@ export default UpdateUser;
 
 ![image](./images/crud-operation2.png)
 
-### Others:
-#### Different way to  Accessing form data:
+## Others:
+### Different way to  Accessing form data:
 
-##### Manual accessing:
+#### Manual accessing:
 
 ```js
 const name = e.target.name.value
@@ -3576,7 +3575,7 @@ const address = e.target.address.value
 const data = {name, email, phone, address}
 ```
 
-##### Using formData():
+#### Using formData():
 we can simplify the process using the FormData constructor. FormData automatically collects all input values from the form, and we can easily convert them into a plain JavaScript object using Object.fromEntries():
 
 ```js
