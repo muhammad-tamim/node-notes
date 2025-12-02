@@ -1,6 +1,6 @@
 <h1 align="center">Node.js Notes</h1>
 
-- [Part 1: Node.js:](#part-1-nodejs)
+- [Part 1: Node:](#part-1-node)
   - [Introduction:](#introduction)
     - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
     - [What can node.js do:](#what-can-nodejs-do)
@@ -40,7 +40,7 @@
       - [OS Module:](#os-module)
       - [Crypto Module:](#crypto-module)
   - [Raw Node.js Project:](#raw-nodejs-project)
-- [Part 2: Express.js:](#part-2-expressjs)
+- [Part 2: Express:](#part-2-express)
   - [Setup:](#setup)
   - [Routing:](#routing)
     - [Route parameters:](#route-parameters)
@@ -78,7 +78,7 @@
     - [findOneAndDelete():](#findoneanddelete)
   - [bulkWrite():](#bulkwrite)
   - [Difference Between req.body, req.params and req.query:](#difference-between-reqbody-reqparams-and-reqquery)
-- [Part 4: Node.js + Express.js + MongoDB:](#part-4-nodejs--expressjs--mongodb)
+- [Part 4: Node + Express + MongoDB:](#part-4-node--express--mongodb)
   - [setup:](#setup-1)
   - [Examples:](#examples)
     - [Example 1:](#example-1)
@@ -87,9 +87,13 @@
     - [Different way to  Accessing form data:](#different-way-to--accessing-form-data)
       - [Manual accessing:](#manual-accessing)
       - [Using formData():](#using-formdata)
+- [Part 5: PostgreSQL:](#part-5-postgresql)
+- [Part 6: Node + Express + PostgreSQL:](#part-6-node--express--postgresql)
+  - [Example:](#example-1)
+    - [Example 1:](#example-1-1)
 
 
-# Part 1: Node.js: 
+# Part 1: Node: 
 
 ## Introduction: 
 Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
@@ -1450,7 +1454,7 @@ in short:
 
 
 
-# Part 2: Express.js:
+# Part 2: Express:
 Express.js is a minimal, flexible and fast web framework for Node.js. It makes building APIs and web servers much easier than using the raw http module.
 
 ## Setup: 
@@ -2804,7 +2808,7 @@ app.get('/users', async (req, res) => {
 ```
 
 
-# Part 4: Node.js + Express.js + MongoDB:
+# Part 4: Node + Express + MongoDB:
 
 ## setup:
 
@@ -3594,3 +3598,258 @@ console.log(coffeeData)
 ```
 
 
+
+# Part 5: PostgreSQL:
+
+# Part 6: Node + Express + PostgreSQL:
+
+## Example:
+### Example 1:
+
+**Setup:**
+
+```js
+npm init -y
+npm i express pg
+npm i -D typescript tsx
+npm i --save-dev @types/express
+npm i --save-dev @types/pg
+tsc --init
+```
+
+```js
+// tsconfig.json
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    "types": [],
+    // For nodejs:
+    // "lib": ["esnext"],
+    // "types": ["node"],
+    // and npm install -D @types/node
+    // Other Outputs
+    // "sourceMap": true,
+    // "declaration": true,
+    // "declarationMap": true,
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    // Style Options
+    // "noImplicitReturns": true,
+    // "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+    // Recommended Options
+    "strict": true,
+    // "jsx": "react-jsx",
+    // "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  }
+}
+```
+
+```js
+{
+  "name": "module-12",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tsx watch ./src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/pg": "^8.15.6",
+    "tsx": "^4.21.0"
+  }
+}
+```
+
+Server: 
+
+```js
+import express, { Request, Response } from 'express'
+import dotenv from 'dotenv'
+import { Pool } from 'pg'
+import path from 'path'
+
+dotenv.config({ path: path.join(process.cwd(), '.env') })
+const app = express()
+app.use(express.json())
+const port = 3000
+
+const pool = new Pool({
+    connectionString: `${process.env.CONNECTION_STR}`
+})
+const initDB = async () => {
+    await pool.query(`
+        CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(150) UNIQUE NOT NULL,
+        age INT,
+        phone VARCHAR(15),
+        address TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+        )`)
+
+    await pool.query(`
+            CREATE TABLE IF NOT EXISTS todos(
+            id SERIAL PRIMARY KEY, 
+            user_id INT REFERENCES users(id) ON DELETE CASCADE,
+            title VARCHAR(200) NOT NULL,
+            description TEXT,
+            complete BOOLEAN DEFAULT false,
+            due_date DATE, 
+            created_at TIMESTAMP DEFAULT NOW(),
+            updated_at TIMESTAMP DEFAULT NOW()
+            )
+            `)
+}
+initDB()
+
+
+app.post('/users', async (req: Request, res: Response) => {
+    const { name, email } = req.body
+
+    try {
+        const result = await pool.query(`INSERT INTO users(name, email) VALUES($1, $2) 
+            RETURNING *`, [name, email])
+
+        res.status(201).json({
+            success: false,
+            message: "data inserted successfully",
+            data: result.rows[0]
+        })
+
+    } catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+})
+
+app.get('/users', async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query(`SELECT * FROM users`)
+        res.status(200).json({
+            success: true,
+            message: "Users retrieved successfully",
+            data: result.rows
+        })
+    }
+    catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+})
+
+app.get('/users/:id', async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [req.params.id])
+        if (result.rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+        else {
+            res.status(200).json({
+                success: true,
+                message: "user fetched successfully",
+                data: result.rows[0]
+            })
+        }
+    }
+    catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+})
+
+app.put("/users/:id", async (req: Request, res: Response) => {
+    // console.log(req.params.id);
+    const { name, email } = req.body;
+    try {
+        const result = await pool.query(
+            `UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING *`,
+            [name, email, req.params.id]
+        );
+
+        if (result.rows.length === 0) {
+            res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        } else {
+            res.status(200).json({
+                success: true,
+                message: "User updated successfully",
+                data: result.rows[0],
+            });
+        }
+    } catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: err.message,
+        });
+    }
+});
+
+app.delete('/users/:id', async (req: Request, res: Response) => {
+    try {
+        const result = await pool.query(`DELETE FROM users WHERE id = $1`, [req.params.id])
+        if (result.rowCount === 0) {
+            res.status(404).json({
+                success: false,
+                message: "User not found"
+            })
+        }
+        else {
+            res.status(200).json({
+                success: true,
+                message: "user deleted successfully",
+                data: result.rows
+            })
+        }
+    }
+    catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: err.message
+        })
+    }
+})
+
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+})
+```
