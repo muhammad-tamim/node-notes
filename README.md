@@ -23,18 +23,7 @@
       - [path module:](#path-module)
       - [fs module:](#fs-module)
         - [Working with Files:](#working-with-files)
-          - [create files:](#create-files)
-          - [Read files:](#read-files)
-          - [Update files:](#update-files)
-          - [Delete files:](#delete-files)
-          - [Renaming files:](#renaming-files)
-          - [Checking files existence:](#checking-files-existence)
-          - [Copying files:](#copying-files)
-          - [Watching Files:](#watching-files)
         - [Working with Folder (Directory):](#working-with-folder-directory)
-          - [Create a folder:](#create-a-folder)
-          - [Delete a folder:](#delete-a-folder)
-          - [Reading folder contents:](#reading-folder-contents)
         - [Streams:](#streams)
           - [Piping (automatic copying):](#piping-automatic-copying)
       - [OS Module:](#os-module)
@@ -721,7 +710,8 @@ As a backend developer, always prefer asynchronous because Node.js is single-thr
 
 ##### Working with Files:
 
-###### create files:
+**create files:**
+
 - fs.writeFile(): Creates new file OR overwrites existing file
 
 ```js
@@ -733,7 +723,7 @@ fs.writeFile('data.txt', 'Hello Tamim!', (err) => {
 });
 ```
 
-###### Read files:
+**Read files:**
 
 ```js
 const fs = require('fs');
@@ -747,7 +737,8 @@ fs.readFile('data.txt', 'utf8', (err, data) => {
 });
 ```
 
-###### Update files:
+**Update files:**
+
 - fs.appendFile: Adds new content without removing old content.
 
 ```js
@@ -759,7 +750,7 @@ fs.appendFile('data.txt', '\nNew line added!', (err) => {
 });
 ```
 
-###### Delete files:
+**Delete files:**
 
 ```js
 const fs = require('fs');
@@ -770,7 +761,7 @@ fs.unlink('data.txt', (err) => {
 });
 ```
 
-###### Renaming files:
+**Renaming files:**
 
 ```js
 const fs = require('fs');
@@ -781,7 +772,7 @@ fs.rename('old.txt', 'new.txt', (err) => {
 });
 ```
 
-###### Checking files existence:
+**Checking files existence:**
 
 ```js
 const fs = require('fs');
@@ -806,7 +797,7 @@ fs.stat('text.txt', (err, stats) => {
 });
 ```
 
-###### Copying files: 
+**Copying files:** 
 
 ```js
 const fs = require('fs');
@@ -816,7 +807,7 @@ fs.copyFile('a.txt', 'backup.txt', err => {
 });
 ```
 
-###### Watching Files:
+**Watching Files:**
 
 ```js
 const fs = require('fs');
@@ -828,7 +819,7 @@ fs.watch('notes.txt', () => {
 
 ##### Working with Folder (Directory):
 
-###### Create a folder:
+**Create a folder:**
 
 ```js
 const fs = require('fs');
@@ -849,7 +840,7 @@ fs.mkdir('a/b/c', { recursive: true }, (err) => {
 });
 ```
 
-###### Delete a folder: 
+**Delete a folder:** 
 
 ```js
 const fs = require('fs');
@@ -857,7 +848,7 @@ const fs = require('fs');
 fs.rmdir('myFolder', { recursive: true }, err => {});
 ```
 
-###### Reading folder contents:
+**Reading folder contents:**
 
 ```js
 const fs = require('fs');
