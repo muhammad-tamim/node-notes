@@ -78,9 +78,10 @@
       - [Using formData():](#using-formdata)
 - [Part 5: PostgreSQL:](#part-5-postgresql)
 - [Part 6: Node + Express + PostgreSQL:](#part-6-node--express--postgresql)
-  - [Example:](#example-1)
+  - [Examples:](#examples-1)
     - [Example 1:](#example-1-1)
     - [Example 2:](#example-2-1)
+    - [Example 3: Modular pattern server:](#example-3-modular-pattern-server)
 
 
 # Part 1: Node: 
@@ -3595,7 +3596,7 @@ console.log(coffeeData)
 
 # Part 6: Node + Express + PostgreSQL:
 
-## Example:
+## Examples:
 ### Example 1:
 
 **Setup:**
@@ -3665,7 +3666,7 @@ tsc --init
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
@@ -3674,7 +3675,8 @@ tsc --init
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/pg": "^8.15.6",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
   }
 }
 ```
@@ -4005,3 +4007,94 @@ app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
 });
 ```
+
+### Example 3: Modular pattern server: 
+
+**Setup:**
+
+```js
+npm init -y
+npm i express pg dotenv bcryptjs jsonwebtoken
+npm i -D typescript tsx
+npm i --save-dev @types/express @types/pg @types/jsonwebtoken
+tsc --init
+```
+
+```js
+// tsconfig.json
+{
+  // Visit https://aka.ms/tsconfig to read more about this file
+  "compilerOptions": {
+    // File Layout
+    "rootDir": "./src",
+    "outDir": "./dist",
+    // Environment Settings
+    // See also https://aka.ms/tsconfig/module
+    "module": "nodenext",
+    "target": "esnext",
+    "types": [],
+    // For nodejs:
+    // "lib": ["esnext"],
+    // "types": ["node"],
+    // and npm install -D @types/node
+    // Other Outputs
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+    // Stricter Typechecking Options
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    // Style Options
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "noPropertyAccessFromIndexSignature": true,
+    // Recommended Options
+    "strict": true,
+    // "jsx": "react-jsx",
+    // "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true,
+  }
+}
+```
+
+```js
+// package.json
+{
+  "name": "module-12",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx tsx watch ./src/server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/pg": "^8.15.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  }
+}
+```
+
+**Server:**
+
+[Click here to see the code](./Node-Express-PostgreSQL-Example3/)
