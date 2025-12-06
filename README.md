@@ -3851,18 +3851,18 @@ app.listen(port, () => {
 ### Example 2: 
 
 ```js
-import express, { Request, Response } from "express"
-import { Pool } from "pg"
+import express, { Request, Response } from "express";
+import { Pool } from "pg";
 import dotenv from "dotenv"
 import path from "path"
 
+const app = express();
+app.use(express.json());
+
+const port = process.env.PORT || 3000;
 dotenv.config({ path: path.join(process.cwd(), ".env") })
-
-const app = express()
-app.use(express.json())
-
-const port = 3000
 const pool = new Pool({ connectionString: `${process.env.CONNECTION_STR}` });
+
 
 const initDB = async () => {
     await pool.query(`
@@ -3870,6 +3870,7 @@ const initDB = async () => {
         id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         email VARCHAR(150) UNIQUE NOT NULL,
+        password TEXT NOT NULL,
         age INT,
         phone VARCHAR(15),
         address TEXT,
@@ -3882,168 +3883,141 @@ const initDB = async () => {
         user_id INT REFERENCES users(id) ON DELETE CASCADE,
         title VARCHAR(200) NOT NULL,
         description TEXT,
-        completed BOOLEAN DEFAULT false,
-        due_date DATE
+        completed BOOLEAN DEFAULT false
         )`)
 }
 initDB()
 
-app.post("/users", async (req: Request, res: Response) => {
-    const { name, email } = req.body
 
+app.post("/users", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query(`INSERT INTO users(name, email) VALUES($1, $2) RETURNING *`,
-            [name, email])
-        res.send(result.rows[0])
+        const { name, email, password } = req.body
+        const result = await pool.query("INSERT INTO users(name, email, password) VALUES($1, $2, $3) RETURNING *",
+            [name, email, password])
+        res.send(result.rows)
     }
     catch (err: any) {
-        res.json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.get("/users", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query(`SELECT * FROM users`)
-        res.status(200).send(result.rows)
+        const result = await pool.query("SELECT * FROM users")
+        res.send(result.rows)
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.get("/users/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
     try {
-        const result = await pool.query(`SELECT * FROM users WHERE id = $1`, [id])
-        if (result.rows.length === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send(result.rows[0])
-        }
+        const id = req.params.id
+        const result = await pool.query("SELECT * FROM users WHERE id=$1", [id])
+        res.send(result.rows[0])
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.put("/users/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
-    const { name, email } = req.body;
-
     try {
-        const result = await pool.query(`UPDATE users SET name=$1, email=$2 WHERE id=$3 RETURNING *`, [name, email, id])
-        if (result.rows.length === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send(result.rows[0])
-        }
+        const id = req.params.id
+        const { name, email, password } = req.body
+        const result = await pool.query("UPDATE users SET name=$1, email=$2, password=$3 WHERE id=$4 RETURNING *",
+            [name, email, password, id])
+        res.send(result.rows[0])
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.delete("/users/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
-
     try {
-        const result = await pool.query(`DELETE FROM users WHERE id = $1`, [id])
-        if (result.rowCount === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send({ Message: "User deleted successfully" })
-        }
+        const id = req.params.id
+
+        const result = await pool.query("DELETE FROM users WHERE id=$1", [id])
+        res.send({ message: "User deleted" })
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
-app.post("/todos", async (req: Request, res: Response) => {
-    const { user_id, title } = req.body
 
+app.post("/todos", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query(`INSERT INTO todos(User_id, title) VALUES($1, $2) RETURNING *`,
-            [user_id, title])
-        res.send(result.rows[0])
+        const { user_id, title } = req.body
+        const result = await pool.query("INSERT INTO todos(user_id, title) VALUES($1, $2) RETURNING *", [user_id, title])
+        res.send(result.rows)
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.get("/todos", async (req: Request, res: Response) => {
     try {
-        const result = await pool.query(`SELECT * FROM todos`)
-        res.status(200).send(result.rows)
+        const result = await pool.query("SELECT * FROM todos")
+        res.send(result.rows)
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.get("/todos/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
     try {
-        const result = await pool.query(`SELECT * FROM todos WHERE id = $1`, [id])
-        if (result.rows.length === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send(result.rows[0])
-        }
+        const id = req.params.id
+        const result = await pool.query("SELECT * FROM todos WHERE id=$1", [id])
+        res.send(result.rows[0])
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.put("/todos/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
-    const { title } = req.body;
-
     try {
-        const result = await pool.query(`UPDATE todos SET title=$1 WHERE id=$2 RETURNING *`, [title, id])
-        if (result.rows.length === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send(result.rows[0])
-        }
+        const id = req.params.id
+        const { title } = req.body
+        const result = await pool.query("UPDATE todos SET title=$1 WHERE id=$2 RETURNING *", [title, id])
+        res.send(result.rows[0])
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
 
 app.delete("/todos/:id", async (req: Request, res: Response) => {
-    const id = req.params.id
-
     try {
-        const result = await pool.query(`DELETE FROM todos WHERE id = $1`, [id])
-        if (result.rowCount === 0) {
-            res.status(400).json({ message: "Not Found" })
-        }
-        else {
-            res.status(200).send({ Message: "User deleted successfully" })
-        }
+        const id = req.params.id
+        const result = await pool.query("DELETE FROM todos WHERE id=$1", [id])
+        res.send({ message: "todos deleted" })
     }
     catch (err: any) {
-        res.status(500).json({ message: err.message })
+        res.status(500).send({ message: err.message })
     }
 })
+
 
 app.use((req: Request, res: Response) => {
     res.status(404).json({
-        error: "Route not found",
-        path: req.path,
-    });
+        error: "Route Not Found",
+        path: req.path
+    })
 })
 
+// Home route
+app.get("/", (req: Request, res: Response) => {
+    res.send("Hello Express!");
+});
+
+// Start server
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-})
+    console.log(`Server running on http://localhost:${port}`);
+});
 ```
