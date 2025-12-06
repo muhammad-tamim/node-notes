@@ -3685,12 +3685,11 @@ import { Pool } from "pg";
 import dotenv from "dotenv"
 import path from "path"
 
-dotenv.config({ path: path.join(process.cwd(), ".env") })
-
 const app = express();
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
+dotenv.config({ path: path.join(process.cwd(), ".env") })
 const pool = new Pool({ connectionString: `${process.env.CONNECTION_STR}` });
 
 const initDB = async () => {
@@ -3700,7 +3699,6 @@ const initDB = async () => {
         )`)
 }
 initDB()
-
 
 app.get("/", (req: Request, res: Response) => {
     res.send("PostgreSQL + TypeScript API is running!");
@@ -3727,17 +3725,17 @@ import { Pool } from "pg";
 import dotenv from "dotenv"
 import path from "path"
 
-dotenv.config({ path: path.join(process.cwd(), ".env") })
-
 const app = express();
 app.use(express.json());
 
 const port = process.env.PORT || 3000;
+dotenv.config({ path: path.join(process.cwd(), ".env") })
 const pool = new Pool({ connectionString: `${process.env.CONNECTION_STR}` });
+
 
 const initDB = async () => {
     await pool.query(`
-        CREATE TABLE IF NOT EXISTS notes (
+    CREATE TABLE IF NOT EXISTS notes (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
@@ -3750,15 +3748,10 @@ initDB()
 app.post("/notes", async (req: Request, res: Response) => {
     try {
         const { title, content } = req.body;
-
-        const result = await pool.query(
-            "INSERT INTO notes (title, content) VALUES ($1, $2) RETURNING *",
-            [title, content]
-        );
-
-        res.json(result.rows[0]);
+        const result = await pool.query("INSERT INTO notes (title, content) VALUES($1, $2) RETURNING *", [title, content]);
+        res.send(result.rows);
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).send({ error });
     }
 });
 
@@ -3768,7 +3761,7 @@ app.get("/notes", async (req: Request, res: Response) => {
         const result = await pool.query("SELECT * FROM notes ORDER BY id DESC");
         res.json(result.rows);
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).send({ error });
     }
 });
 
@@ -3779,7 +3772,7 @@ app.get("/notes/:id", async (req: Request, res: Response) => {
         const result = await pool.query("SELECT * FROM notes WHERE id = $1", [id]);
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).send({ error });
     }
 });
 
@@ -3788,12 +3781,10 @@ app.patch("/notes/:id", async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
         const { title, content } = req.body;
-
         const result = await pool.query(
-            "UPDATE notes SET title = COALESCE($1, title), content = COALESCE($2, content) WHERE id = $3 RETURNING *",
+            "UPDATE notes SET title = COALESCE($1, title), content=COALESCE($2, content) WHERE id=$3 RETURNING *",
             [title, content, id]
         );
-
         res.json(result.rows[0]);
     } catch (error) {
         res.status(500).json({ error });
@@ -3805,15 +3796,10 @@ app.put("/notes/:id", async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
         const { title, content } = req.body;
-
-        const result = await pool.query(
-            "UPDATE notes SET title = $1, content = $2 WHERE id = $3 RETURNING *",
-            [title, content, id]
-        );
-
+        const result = await pool.query("UPDATE notes SET title=$1, content=$2 WHERE id = $3 RETURNING *", [title, content,id]);
         res.json(result.rows[0]);
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).send({ error });
     }
 });
 
@@ -3821,12 +3807,10 @@ app.put("/notes/:id", async (req: Request, res: Response) => {
 app.delete("/notes/:id", async (req: Request, res: Response) => {
     try {
         const id = req.params.id;
-
         await pool.query("DELETE FROM notes WHERE id = $1", [id]);
-
         res.json({ message: "Note deleted" });
     } catch (error) {
-        res.status(500).json({ error });
+        res.status(500).send({ error });
     }
 });
 
