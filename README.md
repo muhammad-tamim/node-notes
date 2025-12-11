@@ -85,10 +85,12 @@
   - [Strings Validations:](#strings-validations)
     - [Number Validations:](#number-validations)
   - [Type Coercion:](#type-coercion)
-- [Part 6: PostgreSQL:](#part-6-postgresql)
-- [Part 7: Node + Express + PostgreSQL:](#part-7-node--express--postgresql)
+- [Part 6: Node + Express + MongoDB + TypeScript + Zod:](#part-6-node--express--mongodb--typescript--zod)
+  - [Example 1:](#example-1-1)
+- [Part 7: PostgreSQL:](#part-7-postgresql)
+- [Part 8: Node + Express + PostgreSQL:](#part-8-node--express--postgresql)
   - [Examples:](#examples-1)
-    - [Example 1:](#example-1-1)
+    - [Example 1:](#example-1-2)
     - [Example 2:](#example-2-1)
     - [Example 3: Modular pattern server:](#example-3-modular-pattern-server)
 
@@ -3775,9 +3777,15 @@ const B = z.coerce.number<number>();
 type BInput = z.input<typeof B>; // => number
 ```
 
-# Part 6: PostgreSQL:
+# Part 6: Node + Express + MongoDB + TypeScript + Zod:
 
-# Part 7: Node + Express + PostgreSQL:
+## Example 1: 
+
+[Click here to see the example](./node-express-mongodb-ts-zod-project1)
+
+# Part 7: PostgreSQL:
+
+# Part 8: Node + Express + PostgreSQL:
 
 ## Examples:
 ### Example 1:
