@@ -1,42 +1,58 @@
 <h1 align="center">Node.js Notes</h1>
 
-- [Node:](#node)
-  - [Introduction:](#introduction)
-    - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
-    - [What can node.js do:](#what-can-nodejs-do)
-    - [Node.js vs Browser:](#nodejs-vs-browser)
-    - [Common Architecture:](#common-architecture)
-    - [How Web Works:](#how-web-works)
-    - [Node Vs Express:](#node-vs-express)
-    - [Common HTTP Status Codes:](#common-http-status-codes)
-    - [How to take input in node.js like C, C++:](#how-to-take-input-in-nodejs-like-c-c)
-  - [Modules:](#modules)
-    - [Types of Modules:](#types-of-modules)
-    - [Types of Module Systems:](#types-of-module-systems)
-    - [Node Package Manager (NPM):](#node-package-manager-npm)
-    - [Node Version Manager(NVM):](#node-version-managernvm)
-    - [package.json:](#packagejson)
-    - [Core Modules:](#core-modules)
-      - [HTTP Module:](#http-module)
+- [Introduction:](#introduction)
+    - [what is server, server-side language and database:](#what-is-server-server-side-language-and-database)
+  - [Node.js:](#nodejs)
+  - [How Node.js Processes a Request:](#how-nodejs-processes-a-request)
+  - [What can node.js do:](#what-can-nodejs-do)
+  - [Node.js vs Browser:](#nodejs-vs-browser)
+  - [Common Architecture:](#common-architecture)
+  - [How Web Works:](#how-web-works)
+  - [Node Vs Express:](#node-vs-express)
+  - [Common HTTP Status Codes:](#common-http-status-codes)
+- [Modules:](#modules)
+  - [Types of Modules:](#types-of-modules)
+  - [Types of Module Systems:](#types-of-module-systems)
+  - [Node Package Manager (NPM):](#node-package-manager-npm)
+  - [Node Version Manager(NVM):](#node-version-managernvm)
+  - [package.json:](#packagejson)
+  - [Core Modules:](#core-modules)
+    - [HTTP Module:](#http-module)
         - [Example:](#example)
-      - [URL Module:](#url-module)
-      - [path module:](#path-module)
-      - [fs module:](#fs-module)
+    - [URL Module:](#url-module)
+    - [path module:](#path-module)
+    - [fs module:](#fs-module)
         - [Working with Files:](#working-with-files)
         - [Working with Folder (Directory):](#working-with-folder-directory)
         - [Streams:](#streams)
           - [Piping (automatic copying):](#piping-automatic-copying)
-      - [OS Module:](#os-module)
-      - [Crypto Module:](#crypto-module)
-  - [Raw Node.js Project:](#raw-nodejs-project)
+    - [OS Module:](#os-module)
+    - [Crypto Module:](#crypto-module)
+- [Raw Node.js Project:](#raw-nodejs-project)
 
 
-# Node: 
+# Introduction: 
 
-## Introduction: 
+### what is server, server-side language and database:
+
+- server: A server is a physical or virtual computer that runs 24/7, receives requests from clients, processes them, and sends responses.
+
+- server-side language: A server-side language is used to write logic that runs on the server to handle requests, apply business rules, and communicate with databases. Examples include Node.js, Go, Java, and Python with their frameworks.
+
+- Database: A database is a system that permanently stores, manages, and retrieves data for server applications.
+
+Explanation: 
+- Server: During development, we use our own computer as a server, so when the computer is turned off, the server stops. In production, we deploy our backend code to hosting platforms like Vercel, which run our server-side code on cloud servers that operate 24/7. 
+
+Note: The server runs the logic, the server-side language defines the logic, and the database stores the data.
+
+
+## Node.js: 
+
 Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
 
 - Runtime is an node.js environment that allows Node.js to run JavaScript outside the browser. 
+
 
 It's non-blocking I/O, event-driven, single-treaded and event loop architecture makes it highly efficient. so node is good for I/O heavy, event-driven: 
 - Real-time applications (chats, collaboration tools)
@@ -45,7 +61,7 @@ It's non-blocking I/O, event-driven, single-treaded and event loop architecture 
 
 Note: Node.js may not be the best choice for CPU-intensive tasks, as they can block the event loop. For such tasks, consider building microservices in a more suitable language, such as Go or Java.
 
-### How Node.js Processes a Request: 
+## How Node.js Processes a Request: 
 
 ```
 Client Request
@@ -86,7 +102,7 @@ Client receives response
 
 Note: Thread Pool: A set of background worker threads that handle heavy CPU-intensive asynchronous tasks that would otherwise block the single main thread.
 
-### What can node.js do:
+## What can node.js do:
 - Build web servers and interact with databases
 - Create APIs
   - RESTful APIs: Use HTTP methods (POST, GET, PUT, PATCH, DELETE) to interact with resources
@@ -95,7 +111,7 @@ Note: Thread Pool: A set of background worker threads that handle heavy CPU-inte
 - Read, write, and manage files on the server
 - Build CLI (Command Line Interface) tools
  
-### Node.js vs Browser:
+## Node.js vs Browser:
 Node.js and browsers both run JavaScript, but they have different environments and capabilities because Node.js is designed for server-side development, while browsers are for client-side applications.
 
 | Node.js                                             | Browser                                                     |
@@ -108,7 +124,7 @@ Node.js and browsers both run JavaScript, but they have different environments a
 
 
 
-### Common Architecture:
+## Common Architecture:
 - Monolithic Architecture:
 One big application that contains everything (frontend, backend, database), if one part fails, the entire app may fail.
 Example: A simple e-commerce website where frontend + backend + database logic live in one project.
@@ -133,7 +149,7 @@ Actions trigger events → other services react. Great for real-time application
 - Serverless Architecture:
 You write code → cloud runs it on demand without managing servers.
 
-### How Web Works:
+## How Web Works:
 
 ![image](./images/how-web-works.webp)
 
@@ -141,7 +157,7 @@ You write code → cloud runs it on demand without managing servers.
 
 
 
-### Node Vs Express:
+## Node Vs Express:
 
 | Feature                        | Node.js                    | Express                    |
 | ------------------------------ | -------------------------- | -------------------------- |
@@ -150,7 +166,7 @@ You write code → cloud runs it on demand without managing servers.
 | Middleware                     | need to write Manual logic | built-in                   |
 | utility methods and properties | very limited               | lots of                    |
 
-### Common HTTP Status Codes:
+## Common HTTP Status Codes:
 
 | Code | Message               | Description                                           |
 | ---- | --------------------- | ----------------------------------------------------- |
@@ -170,41 +186,17 @@ Note:
 - 4xx → Client mistake
 - 5xx → Server mistake
 
-### How to take input in node.js like C, C++:
 
-```js
-const argv = process.argv;
-
-const name = argv[2]
-const age = argv[3]
-
-console.log(argv)
-console.log(name, age)
-
-/*
-process.argv[0] = node path
-process.argv[1] = file path
-process.argv[2] = first actual input value
-
-[
-  '/home/muhammad-tamim/.nvm/versions/node/v24.4.1/bin/node',
-  '/home/muhammad-tamim/programming/notes/node-notes/index.js',
-  'tamim',
-  '20'
-]
-*/
-```
-
-## Modules:
+# Modules:
 A module in Node.js is simply a reusable piece of code (a file or package) that you can import and use in other parts of your application.
 
-### Types of Modules:
+## Types of Modules:
 There are 3 Types of modules: 
 1. Core Modules (built-in):
 Nodes.js have several core modules like (fs, http, path, os). 
 2.  Local Modules (your created file):
 3.  Third party modules (install by npm or others package manager):
-### Types of Module Systems: 
+## Types of Module Systems: 
 Since, js support 2 module system, node.js also support that two but node.js use common.js modules by default, if we want to use ES6 modules on node js, we have change `"type": "commonjs"` to `"type": "module"`
 - Common.js: 
 Uses require() to import and module.exports to export:
@@ -274,7 +266,7 @@ import add from './math.js';
 
 console.log(add(5, 3)); // 8
 ```
-### Node Package Manager (NPM): 
+## Node Package Manager (NPM): 
 Npm is default package manager for node.js packages.
 
 ```js
@@ -285,7 +277,7 @@ npm uninstall <pkg> // Remove a package
 npm install -g <pkg> // Install globally
 npm ls // List installed packages
 ```
-### Node Version Manager(NVM):
+## Node Version Manager(NVM):
 NVM used to install and use different Node.js versions: 
 
 ```js
@@ -293,7 +285,7 @@ nvm install version // For install specific version
 nvm use version // For Switch different version
 npm ls // For see all install versions
 ```
-### package.json:
+## package.json:
 package.json is a special file that describes your Node.js project. It contains information about your app, such as its name, version, dependencies, scripts, and more. 
 
 For Creating a package.json we used: 
@@ -406,8 +398,8 @@ Script: Define a custom scripts that can be run with npm run <script-name>
   }
 }
 ```
-### Core Modules:
-#### HTTP Module:
+## Core Modules:
+### HTTP Module:
 The http module allows us to create HTTP servers and make HTTP requests on node.js. This is the module behind Express.
 
 
@@ -492,7 +484,7 @@ app.get('/coffees', async (req, res) => {
   res.send(result)
 })
 ```
-#### URL Module:
+### URL Module:
 The url module helps you parse URLs, build URLs, and work with query strings
 
 ```js
@@ -541,7 +533,7 @@ console.log(myUrl.href); // https://example.com/products?sort=desc&page=2
 console.log(myUrl.toString());
 console.log(myUrl.href);
 ```
-#### path module:
+### path module:
 The path module helps you work with file paths and directory paths in Node.js. It's essential for handling file system operations in a cross-platform way.
 
 Key Methods: 
@@ -649,7 +641,7 @@ console.log('Directory:', path.dirname(configPath));
 console.log('Filename:', path.basename(configPath));
 console.log('Extension:', path.extname(configPath));
 ```
-#### fs module:
+### fs module:
 The fs module allows you to manage files and folders directly from your Node.js server.
 
 You can use it in two ways:
@@ -880,7 +872,7 @@ const writeStream = fs.createWriteStream('output.txt');
 // Pipe the read stream INTO the write stream
 readStream.pipe(writeStream);
 ```
-#### OS Module: 
+### OS Module: 
 The os module provides operating system-related utility methods and properties. It's useful for getting information about the system your Node.js application is running on.The module gives you information about (CPU, Memory, User, Network, Platform, System uptime etc)
 
 - System Information: 
@@ -1045,7 +1037,7 @@ const os = require('os');
 
 console.log(os.hostname()); // Inspiron-3421
 ```
-#### Crypto Module:
+### Crypto Module:
 The crypto module in Node.js provides cryptographic functionality including hashing, encryption, decryption, signing, and more. It's essential for security-related operations.
 
 - Hashing (sha256, sha512):
@@ -1147,7 +1139,7 @@ console.log(crypto.randomUUID()); // 136dfef5-b9d7-4b88-943f-519487ecba33
 ```
 
 
-## Raw Node.js Project: 
+# Raw Node.js Project: 
 
 ```js
 const http = require('http');
