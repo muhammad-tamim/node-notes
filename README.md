@@ -1173,6 +1173,42 @@ console.log(crypto.randomUUID()); // 136dfef5-b9d7-4b88-943f-519487ecba33
 
 # Raw Node.js Project: 
 
+- Setup: 
+
+```bash
+npm i -y
+```
+
+```bash
+npm i mongodb nodemon cors dotenv
+```
+
+```json
+{
+  "name": "raw-node-project",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.1",
+    "mongodb": "^7.1.1",
+    "nodemon": "^3.1.14"
+  }
+}
+```
+
+- server:
+
 ```js
 const http = require('http');
 const { MongoClient, ObjectId, ServerApiVersion } = require('mongodb');
@@ -1191,7 +1227,7 @@ const client = new MongoClient(uri, {
 
 async function run() {
     await client.connect();
-    const userCollection = client.db("userdb").collection('users');
+    const userCollection = client.db("usersDB").collection('users');
 
 
     const app = http.createServer(async (req, res) => {
@@ -1220,6 +1256,12 @@ async function run() {
 
 
         // Read:
+        if (req.method === "GET" && pathname === "/") {
+            res.writeHead(200, { "Content-Type": "text/plain" });
+            res.end("Hello World");
+            return;
+        }
+
         if (req.method === "GET" && pathname === "/users") {
             try {
                 const result = await userCollection.find().toArray();
@@ -1234,7 +1276,7 @@ async function run() {
         }
 
         // read single data
-        if (req.method === "GET" && pathname.startsWith("/users/")) {
+        if (req.method === "GET" && pathname.startsWith("/users")) {
             const id = pathname.split("/")[2];
             try {
                 const result = await userCollection.findOne({ _id: new ObjectId(id) });
@@ -1255,7 +1297,7 @@ async function run() {
 
 
         // Update:
-        if (req.method === "PATCH" && pathname.startsWith("/users/")) {
+        if (req.method === "PATCH" && pathname.startsWith("/users")) {
             const id = pathname.split("/")[2];
             let body = "";
             req.on("data", chunk => body += chunk);
@@ -1414,6 +1456,3 @@ We know earlier that req is a readable stream, so here:
 in short: 
 - req.on("data") → get pieces of incoming data chunk by chunk
 - req.on("end") → all data received, now process it
-
-
-
