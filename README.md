@@ -1,16 +1,16 @@
 <h1 align="center">Node.js Notes</h1>
 
 - [1. Introduction:](#1-introduction)
-    - [1.0.1. what is server, server-side language and database:](#101-what-is-server-server-side-language-and-database)
-    - [1.0.2. API:](#102-api)
-    - [1.0.3. Node.js:](#103-nodejs)
-    - [1.0.4. How Node.js Processes a Request:](#104-how-nodejs-processes-a-request)
-    - [1.0.5. What can node.js do:](#105-what-can-nodejs-do)
-    - [1.0.6. Node.js vs Browser:](#106-nodejs-vs-browser)
-    - [1.0.7. Common Architecture:](#107-common-architecture)
-    - [1.0.8. How Web Works:](#108-how-web-works)
-    - [1.0.9. Node Vs Express:](#109-node-vs-express)
-    - [1.0.10. Common HTTP Status Codes:](#1010-common-http-status-codes)
+  - [1.1. What is Node.js:](#11-what-is-nodejs)
+  - [1.2. What is runtime environment:](#12-what-is-runtime-environment)
+  - [1.3. Node.js Features:](#13-nodejs-features)
+  - [1.4. When to use node.js and when not:](#14-when-to-use-nodejs-and-when-not)
+  - [1.5. How Node.js Processes a Request:](#15-how-nodejs-processes-a-request)
+  - [1.6. Node Vs Express:](#16-node-vs-express)
+  - [1.7. what is server, server-side language and database:](#17-what-is-server-server-side-language-and-database)
+  - [1.8. What is API:](#18-what-is-api)
+  - [1.9. Common Architecture:](#19-common-architecture)
+  - [1.10. Common HTTP Status Codes:](#110-common-http-status-codes)
 - [2. Modules:](#2-modules)
     - [2.0.1. Types of Modules:](#201-types-of-modules)
     - [2.0.2. Types of Module Systems:](#202-types-of-module-systems)
@@ -35,66 +35,46 @@
 
 # 1. Introduction: 
 
-### 1.0.1. what is server, server-side language and database:
+## 1.1. What is Node.js: 
+Node.js is a JavaScript runtime environment that allows developers to run JavaScript code outside the browser. It is built on Chrome’s V8 JavaScript engine and is mainly used for building backend applications.
 
-- server: A server is a physical or virtual computer that runs 24/7, receives requests from clients, processes them, and sends responses.
+With Node.js, we can work with the file system, networking, databases, operating system features, and more using JavaScrip.
 
-- server-side language: A server-side language is used to write logic that runs on the server to handle requests, apply business rules, and communicate with databases. Examples include Node.js, Go, Java, and Python with their frameworks.
+Node.js also comes with a huge package ecosystem called npm (Node Package Manager), which provides millions of open-source packages such as Express.js, React, Prisma, Mongoose, and MongoDB. We can simply install those packages using npm and use them in our projects to add functionality without having to build everything from scratch.
 
-- Database: A database is a system that permanently stores, manages, and retrieves data for server applications.
-
-Explanation: 
-- Server: During development, we use our own computer as a server, so when the computer is turned off, the server stops. In production, we deploy our backend code to hosting platforms like Vercel, which run our server-side code on cloud servers that operate 24/7. 
-
-Note: The server runs the logic, the server-side language defines the logic, and the database stores the data.
-
-### 1.0.2. API: 
-API stands for Application Programming Interface. It is a bridge between the frontend and the backend that made set of API endpoints. 
-
-```
-    Frontend (client) 
-        ↕
-        API
-        ↕
-Backend (Server + Database)
-```
-
-Example: 
-
-- node + express backend: 
-  
-```js
-app.get('/api/users', (req, res) => {
-  res.json({ name: "Tamim" });
-});
-```
-
-- js frontend: 
+## 1.2. What is runtime environment: 
+Imagine a simple js code like this: 
 
 ```js
-fetch('/api/users')
-  .then(res => res.json())
-  .then(data => console.log(data));
+console.log("Hello");
 ```
 
-Here, 
-- `/api/users` is an API endpoint. The full API consists of multiple such endpoints and rules that ensure the frontend and backend communicate securely and exchange only the necessary data.
- 
-### 1.0.3. Node.js: 
+That code cannot run by itself. Something must execute it. That “something” is called the runtime in the context of JavaScript execution. 
 
-Node.js is a JavaScript runtime that lets us execute JavaScript code outside of a web browser and allowing us to create servers, work with databases, access operating system functionality (file system, networking etc) and more with JavaScript. It is built on Chrome’s V8 JavaScript engine.
+- In Browser: when we run javascript code, the browser have their own runtime environment that executes the code.
+- In Backend: when we run javascript code, then Node.js is the runtime environment that executes the code.
 
-- Runtime is an node.js environment that allows Node.js to run JavaScript outside the browser. 
+## 1.3. Node.js Features: 
+- Runs JavaScript outside the browser so same language for Frontend and Backend
+- Asynchronous and Non-Blocking I/O
+- event-driven architecture
+- Single-Threaded 
+- Huge Package Ecosystem by NPM
+- Streaming Support
+- JSON Friendly
 
+**Note:**
+- Asynchronous means Node.js can perform multiple operations at the same time without waiting for one to finish before starting another.
+- Non-blocking means Node.js while performing asynchronous operations, it does not block the main thread. 
+- event-driven architecture means Node.js uses events and callbacks to handle operations, which helps efficiently manage many concurrent requests and real-time applications.
+- Single-Threaded means Node.js uses a single-threaded by event loop to manage multiple concurrent operations Instead of creating a new thread for every request. 
+- Streaming Support means Node.js has built-in stream support, making it efficient for handling large files and video/audio streaming.
 
-It's non-blocking I/O, event-driven, single-treaded and event loop architecture makes it highly efficient. so node is good for I/O heavy, event-driven: 
-- Real-time applications (chats, collaboration tools)
-- streaming applications 
-- Microservices.
+## 1.4. When to use node.js and when not:
+- Use it: All I/O-heavy applications like - Real-time chat applications, Streaming services, RESTful APIs, Serverless functions, Microservices, Command-line tools, IoT applications etc.
+- Don't use it: CPU-intensive applications like - Video encoding, Image processing, Machine learning, Data analysis, Scientific computing etc. For such tasks, consider building microservices in a more suitable language, such as Go or Java.
 
-Note: Node.js may not be the best choice for CPU-intensive tasks, as they can block the event loop. For such tasks, consider building microservices in a more suitable language, such as Go or Java.
-
-### 1.0.4. How Node.js Processes a Request: 
+## 1.5. How Node.js Processes a Request: 
 
 ```
 Client Request
@@ -133,31 +113,68 @@ Call Stack executes callback → sends response
 Client receives response
 ```
 
-Note: Thread Pool: A set of background worker threads that handle heavy CPU-intensive asynchronous tasks that would otherwise block the single main thread.
+**Note:** Thread Pool: A set of background worker threads that handle heavy CPU-intensive asynchronous tasks that would otherwise block the single main thread.
 
-### 1.0.5. What can node.js do:
-- Build web servers and interact with databases
-- Create APIs
-  - RESTful APIs: Use HTTP methods (POST, GET, PUT, PATCH, DELETE) to interact with resources
-  - GraphQL APIs: Client specifies exactly what data it needs in a single query
-- Handle real-time data using WebSockets
-- Read, write, and manage files on the server
-- Build CLI (Command Line Interface) tools
+
+## 1.6. Node Vs Express:
+
+| Node.js                                                           | Express.js                                                             |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Node.js is a JavaScript runtime environment.                      | Express.js is a web framework for Node.js.                             |
+| Built On Chrome’s V8 JavaScript engine                            | Built on top of Node.js                                                |
+| Main Purpose Run JavaScript outside the browser                   | Main Purpose Simplify the node.js for backend and API development      |
+| Node.js provides low-level modules like `http`, `fs`, and `path`. | Express.js provides higher-level features like routing and middleware. |
+| Building APIs with pure Node.js requires more boilerplate code.   | Express.js reduces boilerplate and speeds up development.              |
+| Node.js can work independently.                                   | Express.js cannot work without Node.js.                                |
+
+
+
+## 1.7. what is server, server-side language and database:
+
+- server: A server is a physical or virtual computer that runs 24/7, receives requests from clients, processes them, and sends responses.
+
+- server-side language: A server-side language is used to write logic that runs on the server to handle requests, apply business rules, and communicate with databases. Examples include Node.js, Go, Java, and Python with their frameworks.
+
+- Database: A database is a system that permanently stores, manages, and retrieves data for server applications.
+
+Explanation: 
+- Server: During development, we use our own computer as a server, so when the computer is turned off, the server stops. In production, we deploy our backend code to hosting platforms like Vercel, which run our server-side code on cloud servers that operate 24/7. 
+
+**Note:** The server runs the logic, the server-side language defines the logic, and the database stores the data.
+
+## 1.8. What is API: 
+API stands for Application Programming Interface. It is a bridge between the frontend and the backend that made set of API endpoints. 
+
+```
+    Frontend (client) 
+        ↕
+        API
+        ↕
+Backend (Server + Database)
+```
+
+Example: 
+
+- node + express backend: 
+  
+```js
+app.get('/api/users', (req, res) => {
+  res.json({ name: "Tamim" });
+});
+```
+
+- js frontend: 
+
+```js
+fetch('/api/users')
+  .then(res => res.json())
+  .then(data => console.log(data));
+```
+
+Here, 
+- `/api/users` is an API endpoint. The full API consists of multiple such endpoints and rules that ensure the frontend and backend communicate securely and exchange only the necessary data.
  
-### 1.0.6. Node.js vs Browser:
-Node.js and browsers both run JavaScript, but they have different environments and capabilities because Node.js is designed for server-side development, while browsers are for client-side applications.
-
-| Node.js                                             | Browser                                                     |
-| --------------------------------------------------- | ----------------------------------------------------------- |
-| provides APIs for file system, networking, and OS   | do not                                                      |
-| Global Object: global                               | Global Object:  window                                      |
-| support CommonJS (require) and ES6 modules (import) | support only ES6 module (import)                            |
-| uses npm/yarn for package management                | use CDN/bundlers(like webpack, vite) for package management |
-
-
-
-
-### 1.0.7. Common Architecture:
+## 1.9. Common Architecture:
 - Monolithic Architecture:
 One big application that contains everything (frontend, backend, database), if one part fails, the entire app may fail.
 Example: A simple e-commerce website where frontend + backend + database logic live in one project.
@@ -182,7 +199,7 @@ Actions trigger events → other services react. Great for real-time application
 - Serverless Architecture:
 You write code → cloud runs it on demand without managing servers.
 
-### 1.0.8. How Web Works:
+###1.0.8. How Web Works:
 
 ![image](./images/how-web-works.webp)
 
@@ -190,16 +207,7 @@ You write code → cloud runs it on demand without managing servers.
 
 
 
-### 1.0.9. Node Vs Express:
-
-| Feature                        | Node.js                    | Express                    |
-| ------------------------------ | -------------------------- | -------------------------- |
-| origin                         | Built on node.js           | Built on googl's V8 engine |
-| Routing                        | Manual                     | Built-in                   |
-| Middleware                     | need to write Manual logic | built-in                   |
-| utility methods and properties | very limited               | lots of                    |
-
-### 1.0.10. Common HTTP Status Codes:
+## 1.10. Common HTTP Status Codes:
 
 | Code | Message               | Description                                           |
 | ---- | --------------------- | ----------------------------------------------------- |
@@ -213,7 +221,7 @@ You write code → cloud runs it on demand without managing servers.
 | 500  | Internal Server Error | Unexpected crash or bug                               |
 | 503  | Service Unavailable   | Server down for maintenance                           |
 
-Note: 
+**Note:** 
 - 2xx → Success
 - 3xx → Redirect
 - 4xx → Client mistake
@@ -464,7 +472,7 @@ here,
 - res.end() - Sends the response and ends the connection
 - server.listen() - Starts the server on the specified port
 
-Note: req and res in Express are the SAME base objects from Node.js, but Express enhances them with many helpful methods and properties.
+**Note:** req and res in Express are the SAME base objects from Node.js, but Express enhances them with many helpful methods and properties.
 
 - Node req: req.url, req.method, req.headers 
   - Express req: req.params, req.query, req.body, req.path, req.ip, req,cookies
@@ -645,7 +653,7 @@ const pathObj = {
 console.log(path.format(pathObj)); // '/users/john/file.txt'
 ```
 
-Note:__dirname and __filename are special Node variables and they don't depend fs module
+**Note:**__dirname and __filename are special Node variables and they don't depend fs module
 
 ```js
 console.log(__dirname);  // directory name of current file
